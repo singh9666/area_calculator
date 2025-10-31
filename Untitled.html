@@ -62,7 +62,7 @@
             <!-- User Information -->
             <div class="mb-6 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 border-l-4 border-indigo-400 flex justify-between items-center">
                 <span>
-                    Authenticated User ID: <span id="user-id" class="font-mono text-gray-800 break-all text-xs md:text-sm">...</span>
+                    Authenticated User: <span id="user-id" class="font-mono text-gray-800 break-all text-xs md:text-sm">...</span>
                 </span>
                 <button onclick="signOutUser()" class="py-1 px-3 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition duration-150">
                     Logout
@@ -229,7 +229,8 @@
                 if (initialAuthToken) {
                     // 1. Use signInWithCustomToken if the token is provided by the environment
                     showMessage("Authenticating with environment token...", false);
-                    await signInWithCustomToken(authInstance, initialAuthToken);
+                    // This creates an anonymous user if one doesn't exist, which is handled by onAuthStateChanged
+                    await signInWithCustomToken(authInstance, initialAuthToken); 
                 } else {
                     // 2. Fall back to anonymous sign-in only if the environment doesn't provide a token
                     showMessage("Authenticating anonymously...", false);
@@ -256,14 +257,26 @@
             db = getFirestore(app);
             auth = getAuth(app);
 
-            // Set up the state change listener first. This will run immediately upon initialization.
-            onAuthStateChanged(auth, (user) => {
+            // Set up the state change listener first.
+            onAuthStateChanged(auth, async (user) => {
+                
+                // IMPORTANT FIX: If a user is present and is Anonymous, sign them out immediately 
+                // to force the login screen and prevent skipping it due to session persistence.
+                if (user && user.isAnonymous) {
+                    console.log("Existing user is anonymous. Signing out to initiate persistent login flow.");
+                    // Clearing the anonymous session forces the next auth state change to user=null, 
+                    // which correctly triggers the persistent login view.
+                    await signOut(auth); 
+                    return; 
+                }
+                
                 if (user) {
-                    // User is signed in (Email/Password or Anonymous)
+                    // Persistent User is signed in (Email/Password)
                     userId = user.uid;
-                    userIdDisplay.textContent = userId;
+                    // Display email if available, otherwise fall back to UID
+                    userIdDisplay.textContent = user.email ? user.email : user.uid; 
                     logButton.disabled = false;
-                    showMessage(`Welcome! User: ${user.uid.substring(0, 8)}... connected.`, false);
+                    showMessage(`Welcome back, ${user.email || user.uid.substring(0, 8) + '...'}. Your history is synced.`, false);
                     setupFirestoreListener(); 
                     statusMessage.classList.add('hidden'); 
                     toggleAppView(true); // Show logged in view
@@ -273,15 +286,15 @@
                         addSetRow();
                     }
                 } else {
-                    // No user found, show the auth screen to prompt for persistent sign-in
+                    // No persistent user found. Show the auth screen.
                     userId = null;
                     userIdDisplay.textContent = 'Not Authenticated';
                     logButton.disabled = true;
-                    showMessage("Please log in or sign up to access your history.", false);
+                    showMessage("Please log in or sign up to save your history across devices.", false);
                     toggleAppView(false); // Show login/signup screen
                     
-                    // Since we've replaced automatic anonymous sign-in with the auth view, 
-                    // we'll only attempt auto sign-in if the token is available
+                    // Attempt to sign in with the environment token if available, but the check above
+                    // will ensure any resulting anonymous user is immediately cleared.
                     if (initialAuthToken) {
                          attemptSignIn(auth);
                     }
@@ -338,7 +351,8 @@
                 }
                 // onAuthStateChanged handles UI update on success
             } catch (error) {
-                const errorMessage = error.message.replace('Firebase: Error ', ''); // Clean up error message
+                // Firebase error messages are usually quite descriptive, but we clean up the prefix.
+                const errorMessage = error.message.replace('Firebase: Error ', ''); 
                 authFeedback.textContent = `Error: ${errorMessage}`;
                 authFeedback.classList.remove('hidden');
             } finally {
