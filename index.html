@@ -70,8 +70,6 @@
         const individualAreasList = document.getElementById('individual-areas');
         let roomCount = 0;
         
-        // Expose calculateTotalArea to the window scope for accessibility if needed, 
-        // though we now rely on the event delegation listener below.
         window.calculateTotalArea = calculateTotalArea;
 
         /**
@@ -81,33 +79,40 @@
             roomCount++;
             const id = `room-${roomCount}`;
             const roomDiv = document.createElement('div');
-            roomDiv.className = 'flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-4 rounded-lg border border-gray-200';
+            // IMPROVED MOBILE LAYOUT: Switched to a standard flex-col gap container for cleaner stacking on mobile
+            roomDiv.className = 'flex flex-col gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200';
             roomDiv.id = id;
             roomDiv.innerHTML = `
-                <div class="flex-grow">
+                <!-- Room Name (Always Full Width) -->
+                <div class="w-full">
                     <label for="${id}-name" class="block text-xs font-medium text-gray-500">Room Name</label>
                     <input type="text" id="${id}-name" value="Room ${roomCount}"
                            class="w-full mt-1 p-2 border border-gray-300 rounded-md text-gray-800 input-field">
                 </div>
 
-                <div class="w-full sm:w-1/3">
-                    <label for="${id}-length" class="block text-xs font-medium text-gray-500">Length (m)</label>
-                    <input type="number" step="0.01" min="0" id="${id}-length" placeholder="Length"
-                           class="w-full mt-1 p-2 border border-gray-300 rounded-md text-gray-800 input-field">
+                <!-- Length and Width (Always Side-by-Side, even on Mobile) -->
+                <div class="flex gap-4 w-full">
+                    <div class="w-1/2">
+                        <label for="${id}-length" class="block text-xs font-medium text-gray-500">Length (m)</label>
+                        <input type="number" step="0.01" min="0" id="${id}-length" placeholder="Length"
+                               class="w-full mt-1 p-2 border border-gray-300 rounded-md text-gray-800 input-field">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="${id}-width" class="block text-xs font-medium text-gray-500">Width (m)</label>
+                        <input type="number" step="0.01" min="0" id="${id}-width" placeholder="Width"
+                               class="w-full mt-1 p-2 border border-gray-300 rounded-md text-gray-800 input-field">
+                    </div>
                 </div>
 
-                <div class="w-full sm:w-1/3">
-                    <label for="${id}-width" class="block text-xs font-medium text-gray-500">Width (m)</label>
-                    <input type="number" step="0.01" min="0" id="${id}-width" placeholder="Width"
-                           class="w-full mt-1 p-2 border border-gray-300 rounded-md text-gray-800 input-field">
+                <!-- Remove Button (Full Width, Aligned to End) -->
+                <div class="w-full flex justify-end">
+                    <button class="remove-room-btn p-2 text-red-500 hover:text-red-700 transition duration-150 rounded-full"
+                            title="Remove Room" data-room-id="${id}" onclick="removeRoom('${id}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-
-                <button class="remove-room-btn flex-shrink-0 mt-4 sm:mt-0 p-2 text-red-500 hover:text-red-700 transition duration-150 rounded-full"
-                        title="Remove Room" data-room-id="${id}" onclick="removeRoom('${id}')">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
             `;
             roomList.appendChild(roomDiv);
             document.getElementById(`${id}-length`).focus();
@@ -185,7 +190,7 @@
             addRoom(); // Add first room on load
             addRoomBtn.addEventListener('click', addRoom);
             
-            // FIX: Use event delegation on the room list container to capture all input changes (including dynamically added rooms).
+            // Use event delegation on the room list container to capture all input changes (including dynamically added rooms).
             roomList.addEventListener('input', (event) => {
                 // Trigger calculation if any relevant input field changes (name, length, or width)
                 if (event.target.type === 'number' || event.target.id.endsWith('-name')) {
