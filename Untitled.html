@@ -26,88 +26,131 @@
         <div id="status-message" class="text-center p-4 bg-yellow-100 text-yellow-800 rounded-lg mb-6 hidden">
             Initializing application...
         </div>
+        
+        <!-- Authentication View (Initial/Logged Out State) -->
+        <div id="view-auth" class="view-content hidden">
+            <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200">
+                <h2 class="text-2xl font-bold text-indigo-800 mb-4">Account Access</h2>
+                <p class="text-sm text-gray-600 mb-6">Create an account to save your workout history across all devices and browsers.</p>
 
-        <!-- User Information -->
-        <div class="mb-6 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 border-l-4 border-indigo-400">
-            Authenticated User ID: <span id="user-id" class="font-mono text-gray-800 break-all text-xs md:text-sm">...</span>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="flex border-b border-gray-200 mb-6">
-            <button onclick="showView('log')" id="tab-log" class="py-3 px-6 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600 hover:text-indigo-800 transition duration-150">Log Workout</button>
-            <button onclick="showView('history')" id="tab-history" class="py-3 px-6 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition duration-150">History & Compare</button>
-        </div>
-
-        <!-- 1. Log Workout View -->
-        <div id="view-log" class="view-content">
-            <form id="log-form" class="space-y-4">
-                <div>
-                    <label for="exercise" class="block text-sm font-medium text-gray-700">Exercise Name (e.g., Bench Press, Squat)</label>
-                    <input type="text" id="exercise" required placeholder="Bench Press, Squat, Run" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:border-indigo-500 focus:ring-indigo-500">
-                </div>
-
-                <!-- Sets Container -->
-                <div id="sets-container" class="space-y-3 border border-dashed border-indigo-300 p-4 rounded-lg bg-indigo-50">
-                    <div class="flex justify-between items-center mb-1">
-                        <h3 class="text-md font-bold text-indigo-800">Sets Details</h3>
+                <form id="auth-form" class="space-y-4">
+                    <div>
+                        <label for="auth-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="auth-email" required placeholder="your.email@example.com" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
-                    <!-- Set rows will be dynamically added here -->
+                    <div>
+                        <label for="auth-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="auth-password" required placeholder="Minimum 6 characters" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+
+                    <button type="submit" id="auth-button" data-action="signup" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+                        Sign Up
+                    </button>
+                    <p id="auth-feedback" class="text-sm text-center text-red-600 mt-2 hidden"></p>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <button id="toggle-auth-mode" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
+                        Already have an account? Log In
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logged In Content -->
+        <div id="logged-in-content" class="hidden">
+            <!-- User Information -->
+            <div class="mb-6 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 border-l-4 border-indigo-400 flex justify-between items-center">
+                <span>
+                    Authenticated User ID: <span id="user-id" class="font-mono text-gray-800 break-all text-xs md:text-sm">...</span>
+                </span>
+                <button onclick="signOutUser()" class="py-1 px-3 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition duration-150">
+                    Logout
+                </button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="showView('log')" id="tab-log" class="py-3 px-6 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600 hover:text-indigo-800 transition duration-150">Log Workout</button>
+                <button onclick="showView('history')" id="tab-history" class="py-3 px-6 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition duration-150">History & Compare</button>
+            </div>
+
+            <!-- 1. Log Workout View -->
+            <div id="view-log" class="view-content">
+                <form id="log-form" class="space-y-4">
+                    <div>
+                        <label for="exercise" class="block text-sm font-medium text-gray-700">Exercise Name (e.g., Bench Press, Squat)</label>
+                        <input type="text" id="exercise" required placeholder="Bench Press, Squat, Run" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+
+                    <!-- Sets Container -->
+                    <div id="sets-container" class="space-y-3 border border-dashed border-indigo-300 p-4 rounded-lg bg-indigo-50">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-md font-bold text-indigo-800">Sets Details</h3>
+                        </div>
+                        <!-- Set rows will be dynamically added here -->
+                    </div>
+
+                    <button type="button" onclick="addSetRow()" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Add Another Set</span>
+                    </button>
+
+                    <button type="submit" id="log-button" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 disabled:opacity-50" disabled>
+                        Log Workout
+                    </button>
+                    <p id="form-feedback" class="text-sm text-center text-green-600 mt-2 hidden"></p>
+                </form>
+            </div>
+
+            <!-- 2. History & Compare View -->
+            <div id="view-history" class="view-content hidden">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Workout History</h2>
+
+                <!-- Filter Buttons -->
+                <div class="flex space-x-2 mb-4">
+                    <button onclick="setFilter('all')" class="filter-btn bg-indigo-600 text-white px-3 py-1 text-sm rounded-full transition duration-150">All Time</button>
+                    <button onclick="setFilter('week')" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full hover:bg-gray-300 transition duration-150">Last 7 Days</button>
+                    <button onclick="setFilter('month')" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full hover:bg-gray-300 transition duration-150">Last 30 Days</button>
                 </div>
 
-                <button type="button" onclick="addSetRow()" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Add Another Set</span>
-                </button>
+                <!-- Comparison Statistics -->
+                <div id="comparison-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- Stats will be populated here -->
+                </div>
 
-                <button type="submit" id="log-button" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 disabled:opacity-50" disabled>
-                    Log Workout
-                </button>
-                <p id="form-feedback" class="text-sm text-center text-green-600 mt-2 hidden"></p>
-            </form>
-        </div>
-
-        <!-- 2. History & Compare View -->
-        <div id="view-history" class="view-content hidden">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Workout History</h2>
-
-            <!-- Filter Buttons -->
-            <div class="flex space-x-2 mb-4">
-                <button onclick="setFilter('all')" class="filter-btn bg-indigo-600 text-white px-3 py-1 text-sm rounded-full transition duration-150">All Time</button>
-                <button onclick="setFilter('week')" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full hover:bg-gray-300 transition duration-150">Last 7 Days</button>
-                <button onclick="setFilter('month')" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full hover:bg-gray-300 transition duration-150">Last 30 Days</button>
-            </div>
-
-            <!-- Comparison Statistics -->
-            <div id="comparison-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <!-- Stats will be populated here -->
-            </div>
-
-            <!-- Workout List -->
-            <div id="workout-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
-                <p class="text-gray-500 text-center" id="empty-state">No workouts logged yet. Start logging in the other tab!</p>
-                <!-- Workouts will be listed here -->
+                <!-- Workout List -->
+                <div id="workout-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                    <p class="text-gray-500 text-center" id="empty-state">No workouts logged yet. Start logging in the other tab!</p>
+                    <!-- Workouts will be listed here -->
+                </div>
             </div>
         </div>
-
     </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
         // --- FIREBASE CONFIGURATION (FOR GITHUB/LOCAL USE) ---
-        // This configuration will be used when the app is run outside the Canvas environment (e.g., GitHub Pages).
+        // !!! IMPORTANT: The values below MUST be replaced with the exact config from your Firebase Console.
         const myFirebaseConfig = {
+            // VERIFY THIS KEY IS CORRECT
             apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw", 
+            // VERIFY THIS DOMAIN IS CORRECT
             authDomain: "gymlog-3ef3b.firebaseapp.com",
+            // VERIFY THIS PROJECT ID IS CORRECT
             projectId: "gymlog-3ef3b",
+            // VERIFY THIS BUCKET IS CORRECT
             storageBucket: "gymlog-3ef3b.firebasestorage.app",
+            // VERIFY THIS SENDER ID IS CORRECT
             messagingSenderId: "139587565969",
+            // VERIFY THIS APP ID IS CORRECT
             appId: "1:139587565969:web:90bf938d213afbc81e0230"
         };
         
@@ -127,6 +170,7 @@
         let allWorkouts = []; 
         let currentFilter = 'all';
 
+        // UI Elements
         const statusMessage = document.getElementById('status-message');
         const userIdDisplay = document.getElementById('user-id');
         const logButton = document.getElementById('log-button');
@@ -136,6 +180,12 @@
         const comparisonStats = document.getElementById('comparison-stats');
         const emptyState = document.getElementById('empty-state');
         const setsContainer = document.getElementById('sets-container');
+        const viewAuth = document.getElementById('view-auth');
+        const loggedInContent = document.getElementById('logged-in-content');
+        const authForm = document.getElementById('auth-form');
+        const authButton = document.getElementById('auth-button');
+        const authFeedback = document.getElementById('auth-feedback');
+        const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
 
         // --- Utility Functions ---
 
@@ -156,24 +206,40 @@
             });
         }
 
+        function toggleAppView(isLoggedIn) {
+            if (isLoggedIn) {
+                viewAuth.classList.add('hidden');
+                loggedInContent.classList.remove('hidden');
+                showView('log'); // Default to log view after sign-in
+            } else {
+                loggedInContent.classList.add('hidden');
+                viewAuth.classList.remove('hidden');
+                // Ensure initial sign up view is shown on logout
+                authButton.dataset.action = 'signup';
+                authButton.textContent = 'Sign Up';
+                toggleAuthModeButton.textContent = 'Already have an account? Log In';
+                authForm.reset();
+            }
+        }
+
         // --- Authentication and Initialization ---
         
         async function attemptSignIn(authInstance) {
             try {
                 if (initialAuthToken) {
-                    showMessage("Authenticating with custom token...", false);
-                    // Use signInWithCustomToken if the token is provided by the environment
+                    // 1. Use signInWithCustomToken if the token is provided by the environment
+                    showMessage("Authenticating with environment token...", false);
                     await signInWithCustomToken(authInstance, initialAuthToken);
                 } else {
+                    // 2. Fall back to anonymous sign-in only if the environment doesn't provide a token
                     showMessage("Authenticating anonymously...", false);
-                    // Fall back to anonymous sign-in if no custom token is provided
                     await signInAnonymously(authInstance);
                 }
             } catch (error) {
-                // The onAuthStateChanged listener will update the UI, but we log the error here too
                 showMessage(`Authentication error: ${error.message}`, true);
                 console.error("Firebase Auth Error during sign-in (caught in attemptSignIn):", error);
                 userIdDisplay.textContent = 'Auth Failed';
+                toggleAppView(false); // Show auth screen on failure
             }
         }
 
@@ -181,7 +247,6 @@
             setLogLevel('debug'); // Enable Firestore logging
 
             // Check if config is placeholder and warn the user if running outside Canvas
-            // This check now relies on the correctly configured myFirebaseConfig fallback
             if (Object.keys(firebaseConfig).length === 0 || firebaseConfig.apiKey === "YOUR_API_KEY") {
                  showMessage("Error: Firebase configuration is missing or is using placeholder values. Data persistence will NOT work on GitHub.", true);
                  return;
@@ -194,21 +259,93 @@
             // Set up the state change listener first. This will run immediately upon initialization.
             onAuthStateChanged(auth, (user) => {
                 if (user) {
-                    // User is signed in or successfully signed in (either via token or anonymously)
+                    // User is signed in (Email/Password or Anonymous)
                     userId = user.uid;
                     userIdDisplay.textContent = userId;
                     logButton.disabled = false;
-                    showMessage("Successfully connected to Firebase. Ready to log workouts.", false);
+                    showMessage(`Welcome! User: ${user.uid.substring(0, 8)}... connected.`, false);
                     setupFirestoreListener(); 
                     statusMessage.classList.add('hidden'); 
-                    addSetRow();
+                    toggleAppView(true); // Show logged in view
+                    
+                    // Only add the initial set row if it's empty
+                    if (setsContainer.querySelectorAll('.set-row').length === 0) {
+                        addSetRow();
+                    }
                 } else {
-                    // No user found, initiate the sign-in process
-                    userIdDisplay.textContent = 'Not Authenticated (Signing In...)';
-                    attemptSignIn(auth);
+                    // No user found, show the auth screen to prompt for persistent sign-in
+                    userId = null;
+                    userIdDisplay.textContent = 'Not Authenticated';
+                    logButton.disabled = true;
+                    showMessage("Please log in or sign up to access your history.", false);
+                    toggleAppView(false); // Show login/signup screen
+                    
+                    // Since we've replaced automatic anonymous sign-in with the auth view, 
+                    // we'll only attempt auto sign-in if the token is available
+                    if (initialAuthToken) {
+                         attemptSignIn(auth);
+                    }
                 }
             });
         }
+        
+        async function signOutUser() {
+             try {
+                await signOut(auth);
+                showMessage("Successfully logged out. Sign in to retrieve your history.", false);
+             } catch (error) {
+                showMessage(`Logout failed: ${error.message}`, true);
+                console.error("Firebase Sign Out Error:", error);
+             }
+        }
+
+        window.signOutUser = signOutUser; // Expose to global scope for HTML button
+
+        // --- Email/Password Form Logic ---
+
+        toggleAuthModeButton.addEventListener('click', () => {
+            const currentAction = authButton.dataset.action;
+            if (currentAction === 'signup') {
+                authButton.dataset.action = 'login';
+                authButton.textContent = 'Log In';
+                toggleAuthModeButton.textContent = 'Need an account? Sign Up';
+            } else {
+                authButton.dataset.action = 'signup';
+                authButton.textContent = 'Sign Up';
+                toggleAuthModeButton.textContent = 'Already have an account? Log In';
+            }
+            authFeedback.classList.add('hidden');
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const action = authButton.dataset.action;
+            
+            authButton.disabled = true;
+            authButton.textContent = action === 'signup' ? 'Signing Up...' : 'Logging In...';
+            authFeedback.classList.add('hidden');
+            
+            try {
+                if (action === 'signup') {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showMessage("Sign up successful! You are now logged in.", false);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showMessage("Login successful! Welcome back.", false);
+                }
+                // onAuthStateChanged handles UI update on success
+            } catch (error) {
+                const errorMessage = error.message.replace('Firebase: Error ', ''); // Clean up error message
+                authFeedback.textContent = `Error: ${errorMessage}`;
+                authFeedback.classList.remove('hidden');
+            } finally {
+                authButton.disabled = false;
+                authButton.textContent = action === 'signup' ? 'Sign Up' : 'Log In';
+            }
+        });
 
 
         // --- Dynamic Set Input Handling ---
