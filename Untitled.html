@@ -100,14 +100,16 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-        // IMPORTANT: Global variables provided by the Canvas environment
+        // --- FIREBASE CONFIGURATION (Using Canvas Globals) ---
+        // Global variables are mandated for reliable operation in the Canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // ------------------------------------------
 
         let db, auth;
         let userId = null;
-        let allWorkouts = []; // Cache all workouts for comparison
+        let allWorkouts = []; 
         let currentFilter = 'all';
 
         const statusMessage = document.getElementById('status-message');
@@ -118,7 +120,7 @@
         const workoutList = document.getElementById('workout-list');
         const comparisonStats = document.getElementById('comparison-stats');
         const emptyState = document.getElementById('empty-state');
-        const setsContainer = document.getElementById('sets-container'); // New reference
+        const setsContainer = document.getElementById('sets-container');
 
         // --- Utility Functions ---
 
@@ -127,12 +129,10 @@
             statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
             statusMessage.classList.add(isError ? 'bg-red-100' : 'bg-yellow-100', isError ? 'text-red-800' : 'text-yellow-800');
             if (!isError) {
-                // Hide success/info messages after a few seconds
                 setTimeout(() => statusMessage.classList.add('hidden'), 5000);
             }
         }
 
-        // Helper to format Date objects
         function formatDate(timestamp) {
             const date = timestamp instanceof Timestamp ? timestamp.toDate() : timestamp;
             return date.toLocaleString('en-US', {
@@ -142,44 +142,57 @@
         }
 
         // --- Authentication and Initialization ---
+        
+        async function attemptSignIn(authInstance) {
+            try {
+                if (initialAuthToken) {
+                    showMessage("Authenticating with custom token...", false);
+                    // Use signInWithCustomToken if the token is provided by the environment
+                    await signInWithCustomToken(authInstance, initialAuthToken);
+                } else {
+                    showMessage("Authenticating anonymously...", false);
+                    // Fall back to anonymous sign-in if no custom token is provided
+                    await signInAnonymously(authInstance);
+                }
+            } catch (error) {
+                // The onAuthStateChanged listener will update the UI, but we log the error here too
+                showMessage(`Authentication error: ${error.message}`, true);
+                console.error("Firebase Auth Error during sign-in (caught in attemptSignIn):", error);
+                userIdDisplay.textContent = 'Auth Failed';
+            }
+        }
 
         async function initFirebase() {
-            if (!firebaseConfig) {
-                showMessage("ERROR: Firebase configuration is missing. Cannot initialize application.", true);
-                return;
+            setLogLevel('debug'); // Enable Firestore logging
+
+            if (Object.keys(firebaseConfig).length === 0) {
+                 showMessage("Error: Firebase configuration is missing.", true);
+                 return;
             }
 
-            setLogLevel('debug'); // Enable Firestore logging
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
 
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
+            // Set up the state change listener first. This will run immediately upon initialization.
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in or successfully signed in (either via token or anonymously)
+                    userId = user.uid;
+                    userIdDisplay.textContent = userId;
+                    logButton.disabled = false;
+                    showMessage("Successfully connected to Firebase. Ready to log workouts.", false);
+                    setupFirestoreListener(); 
+                    statusMessage.classList.add('hidden'); 
+                    addSetRow();
                 } else {
-                    await signInAnonymously(auth);
+                    // No user found, initiate the sign-in process
+                    userIdDisplay.textContent = 'Not Authenticated (Signing In...)';
+                    attemptSignIn(auth);
                 }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        userIdDisplay.textContent = userId;
-                        logButton.disabled = false;
-                        showMessage("Successfully connected to Firebase. Ready to log workouts.", false);
-                        setupFirestoreListener(); // Start listening for data
-                        statusMessage.classList.add('hidden'); // Hide status message on success
-                        addSetRow(); // Add the initial set row
-                    } else {
-                        showMessage("Authentication failed. Please check environment settings.", true);
-                        userIdDisplay.textContent = 'Not Authenticated';
-                    }
-                });
-            } catch (error) {
-                showMessage(`Authentication error: ${error.message}`, true);
-                console.error("Firebase Auth Error:", error);
-            }
+            });
         }
+
 
         // --- Dynamic Set Input Handling ---
 
@@ -191,7 +204,7 @@
                     label.textContent = `Set ${index + 1}`;
                 }
                 const removeBtn = row.querySelector('.remove-set-btn');
-                removeBtn.disabled = rows.length === 1; // Cannot remove the last set
+                removeBtn.disabled = rows.length === 1; 
             });
         }
 
@@ -237,7 +250,7 @@
         // --- Data Persistence (Firestore) ---
 
         function getCollectionPath() {
-            // Private data storage path: /artifacts/{appId}/users/{userId}/{collectionName}
+            // Path: /artifacts/{appId}/users/{userId}/workouts
             return `artifacts/${appId}/users/${userId}/workouts`;
         }
 
@@ -287,8 +300,8 @@
                     id: doc.id,
                     ...doc.data()
                 }));
-                allWorkouts = fetchedWorkouts; // Update the cache
-                renderWorkouts(); // Re-render the UI based on current filter
+                allWorkouts = fetchedWorkouts; 
+                renderWorkouts(); 
             }, (error) => {
                 showMessage(`Error fetching real-time data: ${error.message}`, true);
                 console.error("Firestore Listener Error:", error);
@@ -312,11 +325,11 @@
             document.getElementById(`tab-${viewName}`).classList.add('border-indigo-600', 'text-indigo-600');
 
             if (viewName === 'history') {
-                renderWorkouts(); // Ensure history is updated when view is opened
+                renderWorkouts(); 
             }
         }
 
-        window.showView = showView; // Make globally accessible
+        window.showView = showView; 
 
         function setFilter(filter) {
             currentFilter = filter;
@@ -332,20 +345,19 @@
             renderWorkouts();
         }
 
-        window.setFilter = setFilter; // Make globally accessible
+        window.setFilter = setFilter; 
 
         function getFilteredWorkouts() {
             const now = new Date().getTime();
             let cutoffTime = 0;
 
             if (currentFilter === 'week') {
-                cutoffTime = now - (7 * 24 * 60 * 60 * 1000); // 7 days ago
+                cutoffTime = now - (7 * 24 * 60 * 60 * 1000); 
             } else if (currentFilter === 'month') {
-                cutoffTime = now - (30 * 24 * 60 * 60 * 1000); // 30 days ago
+                cutoffTime = now - (30 * 24 * 60 * 60 * 1000); 
             }
 
             return allWorkouts.filter(w => {
-                // Handle older/corrupted data that might not have a proper timestamp structure
                 if (!w.timestamp || typeof w.timestamp.toDate !== 'function') return false;
 
                 const workoutTime = w.timestamp.toDate().getTime();
@@ -367,15 +379,13 @@
 
             let heaviestLift = { exercise: 'N/A', weight: 0 };
 
-            // Iterate over all workouts, and for each workout, iterate over all sets
             workouts.forEach(w => {
-                // Ensure w.sets is an array before trying to iterate
                 if (Array.isArray(w.sets)) {
                     w.sets.forEach(set => {
                         const weight = parseFloat(set.weight);
                         if (!isNaN(weight) && weight > heaviestLift.weight) {
                             heaviestLift = {
-                                exercise: w.exercise, // The exercise name from the parent workout
+                                exercise: w.exercise, 
                                 weight: weight
                             };
                         }
@@ -387,7 +397,6 @@
         }
 
         function renderComparisonStats(stats) {
-            // Added a defensive fallback for heavyLift to prevent TypeError
             const heavyLift = stats.heavyLift || { exercise: 'N/A', weight: 0 };
 
             comparisonStats.innerHTML = `
@@ -421,7 +430,6 @@
             }
 
             const html = filteredWorkouts.map(workout => {
-                // Handle cases where 'sets' might not be an array (for new data structure consistency)
                 const sets = Array.isArray(workout.sets) ? workout.sets : [];
 
                 const setsHtml = sets.map((set, index) => `
@@ -462,7 +470,7 @@
             workoutList.innerHTML = html;
         }
 
-        window.deleteWorkout = deleteWorkout; // Make globally accessible
+        window.deleteWorkout = deleteWorkout; 
 
         // --- Event Listeners ---
 
@@ -480,7 +488,7 @@
                     weight: row.querySelector('input[name="weight"]').value,
                     reps: row.querySelector('input[name="reps"]').value.trim()
                 };
-            }).filter(set => set.weight && set.reps); // Only include sets that have both values
+            }).filter(set => set.weight && set.reps); 
 
             if (sets.length === 0) {
                 logButton.disabled = false;
@@ -491,7 +499,7 @@
 
             const workoutData = {
                 exercise: exercise,
-                sets: sets // Store the array of sets
+                sets: sets 
             };
 
             const success = await saveWorkout(workoutData);
@@ -500,9 +508,8 @@
                 feedbackMessage.textContent = `${exercise} (${sets.length} sets) logged successfully!`;
                 feedbackMessage.classList.remove('hidden');
                 logForm.reset();
-                setsContainer.innerHTML = ''; // Clear sets container
-                addSetRow(); // Add back one initial row
-                // Automatically switch to history view after logging
+                setsContainer.innerHTML = ''; 
+                addSetRow(); 
                 showView('history');
             } else {
                 feedbackMessage.textContent = `Error logging workout.`;
@@ -524,7 +531,7 @@
         window.onload = function() {
             showMessage("Starting Firebase initialization...");
             initFirebase();
-            setFilter('all'); // Set default filter
+            setFilter('all'); 
         };
 
     </script>
