@@ -1,274 +1,532 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6d6d6d; -webkit-text-stroke: #6d6d6d}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #6b0001; -webkit-text-stroke: #6b0001}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #fb0007; -webkit-text-stroke: #fb0007}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #0000ff; -webkit-text-stroke: #0000ff}
-    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; -webkit-text-stroke: #000000}
-    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #4d5055; -webkit-text-stroke: #4d5055}
-    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; -webkit-text-stroke: #000000; min-height: 16.0px}
-    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Menlo; color: #18702b; -webkit-text-stroke: #18702b}
-    span.s1 {font-kerning: none; background-color: #ecf1f7}
-    span.s2 {font-kerning: none; color: #fb0007; background-color: #ecf1f7; -webkit-text-stroke: 0px #fb0007}
-    span.s3 {font-kerning: none; color: #2a2a2a; background-color: #ecf1f7; -webkit-text-stroke: 0px #2a2a2a}
-    span.s4 {font-kerning: none; color: #000000; background-color: #ecf1f7; -webkit-text-stroke: 0px #000000}
-    span.s5 {font-kerning: none; color: #0000ff; background-color: #ecf1f7; -webkit-text-stroke: 0px #0000ff}
-    span.s6 {font-kerning: none; color: #6b0001; background-color: #ecf1f7; -webkit-text-stroke: 0px #6b0001}
-    span.s7 {font-kerning: none; color: #4d5055; background-color: #ecf1f7; -webkit-text-stroke: 0px #4d5055}
-    span.s8 {font-kerning: none; color: #18702b; background-color: #ecf1f7; -webkit-text-stroke: 0px #18702b}
-    span.s9 {font-kerning: none; color: #093c94; background-color: #ecf1f7; -webkit-text-stroke: 0px #093c94}
-    span.s10 {font-kerning: none; color: #6f0ec3; background-color: #ecf1f7; -webkit-text-stroke: 0px #6f0ec3}
-    span.s11 {font-kerning: none}
-    span.s12 {font-kerning: none; color: #0e6e6d; background-color: #ecf1f7; -webkit-text-stroke: 0px #0e6e6d}
-    span.s13 {font-kerning: none; color: #a4450b; background-color: #ecf1f7; -webkit-text-stroke: 0px #a4450b}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Fitness Logger</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
 </head>
-<body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE</span><span class="s2"> html</span><span class="s1">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;</span><span class="s1">html</span><span class="s4"> </span><span class="s2">lang</span><span class="s3">=</span><span class="s5">"en"</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;</span><span class="s1">head</span><span class="s3">&gt;</span></p>
-<p class="p3"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">meta</span><span class="s4"> </span><span class="s1">charset</span><span class="s3">=</span><span class="s5">"UTF-8"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">meta</span><span class="s4"> </span><span class="s2">name</span><span class="s3">=</span><span class="s1">"viewport"</span><span class="s4"> </span><span class="s2">content</span><span class="s3">=</span><span class="s1">"width=device-width, initial-scale=1.0"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">title</span><span class="s3">&gt;</span><span class="s1">Flooring Job Report Generator</span><span class="s3">&lt;/</span><span class="s6">title</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s7">&lt;!-- Load Tailwind CSS --&gt;</span><span class="s3">&lt;</span><span class="s6">script</span><span class="s4"> </span><span class="s2">src</span><span class="s3">=</span><span class="s1">"https://cdn.tailwindcss.com"</span><span class="s3">&gt;&lt;/</span><span class="s6">script</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s1">style</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">/* Custom font */</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s6">body</span><span class="s1"> { </span><span class="s2">font-family:</span><span class="s1"> </span><span class="s8">'Inter'</span><span class="s1">, </span><span class="s9">sans-serif</span><span class="s1">; }</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">style</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s7">&lt;!-- Load jsPDF library (for PDF generation) --&gt;</span><span class="s3">&lt;</span><span class="s6">script</span><span class="s4"> </span><span class="s2">src</span><span class="s3">=</span><span class="s1">"https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"</span><span class="s3">&gt;&lt;/</span><span class="s6">script</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s1">script</span><span class="s3">&gt;</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s1">// Define necessary global variables for the libraries to work inside the window scope</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s10">const</span><span class="s1"> { jsPDF } = window.jspdf;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s7">/**</span></p>
-<p class="p6"><span class="s1"><span class="Apple-converted-space">         </span>* Generates the PDF document directly using jsPDF.</span></p>
-<p class="p6"><span class="s1"><span class="Apple-converted-space">         </span>*/</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s10">function</span><span class="s1"> generatePDF() {</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// 1. Get form values</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> name = document.getElementById(</span><span class="s8">'customerName'</span><span class="s1">).value;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> email = document.getElementById(</span><span class="s8">'customerEmail'</span><span class="s1">).value;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> phone = document.getElementById(</span><span class="s8">'customerPhone'</span><span class="s1">).value;</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// New Flooring Job Details</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> jobDate = document.getElementById(</span><span class="s8">'jobDate'</span><span class="s1">).value;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> customerAddress = document.getElementById(</span><span class="s8">'customerAddress'</span><span class="s1">).value;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> totalArea = document.getElementById(</span><span class="s8">'totalArea'</span><span class="s1">).value;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> floorType = document.getElementById(</span><span class="s8">'floorType'</span><span class="s1">).value;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> fittingAmount = document.getElementById(</span><span class="s8">'fittingAmount'</span><span class="s1">).value;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> messageBox = document.getElementById(</span><span class="s8">'messageBox'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>messageBox.classList.add(</span><span class="s8">'hidden'</span><span class="s1">); </span><span class="s7">// Hide any previous messages</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Simple validation for required fields</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">if</span><span class="s1"> (!name || !email || !jobDate || !customerAddress || !totalArea || !floorType || !fittingAmount) {</span></p>
-<p class="p8"><span class="s4"><span class="Apple-converted-space">                </span>messageBox.textContent = </span><span class="s1">'Please fill out all required fields marked with (*).'</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>messageBox.classList.remove(</span><span class="s8">'hidden'</span><span class="s1">, </span><span class="s8">'bg-green-100'</span><span class="s1">, </span><span class="s8">'text-green-700'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>messageBox.classList.add(</span><span class="s8">'bg-red-100'</span><span class="s1">, </span><span class="s8">'text-red-700'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s10">return</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Format fitting amount as currency (using USD as a general example)</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> formattedAmount = </span><span class="s10">new</span><span class="s1"> </span><span class="s12">Intl</span><span class="s1">.</span><span class="s12">NumberFormat</span><span class="s1">(</span><span class="s8">'en-US'</span><span class="s1">, {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>style: </span><span class="s8">'currency'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>currency: </span><span class="s8">'USD'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}).format(fittingAmount);</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">// Show loading state</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">const</span><span class="s1"> generateButton = document.getElementById(</span><span class="s8">'generateButton'</span><span class="s1">);</span></p>
-<p class="p8"><span class="s4"><span class="Apple-converted-space">            </span>generateButton.innerHTML = </span><span class="s1">`&lt;svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"&gt;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">                </span>&lt;circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"&gt;&lt;/circle&gt;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">                </span>&lt;path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"&gt;&lt;/path&gt;</span></p>
-<p class="p8"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/svg&gt; Generating Report...`</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>generateButton.disabled = </span><span class="s10">true</span><span class="s1">;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s10">try</span><span class="s1"> {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s10">const</span><span class="s1"> pdf = </span><span class="s10">new</span><span class="s1"> jsPDF({</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>orientation: </span><span class="s8">'portrait'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>unit: </span><span class="s8">'mm'</span><span class="s1">,</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span>format: </span><span class="s8">'a4'</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>});</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s10">let</span><span class="s1"> y_pos = </span><span class="s13">20</span><span class="s1">; </span><span class="s7">// Starting Y position</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// --- Header ---</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFillColor(</span><span class="s13">67</span><span class="s1">, </span><span class="s13">56</span><span class="s1">, </span><span class="s13">202</span><span class="s1">); </span><span class="s7">// Indigo-700 equivalent</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.rect(</span><span class="s13">0</span><span class="s1">, </span><span class="s13">0</span><span class="s1">, </span><span class="s13">210</span><span class="s1">, </span><span class="s13">25</span><span class="s1">, </span><span class="s8">'F'</span><span class="s1">); </span><span class="s7">// Full width header bar</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFontSize(</span><span class="s13">24</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">255</span><span class="s1">, </span><span class="s13">255</span><span class="s1">, </span><span class="s13">255</span><span class="s1">); </span><span class="s7">// White text</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">"Flooring Job Report"</span><span class="s1">, </span><span class="s13">105</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, { align: </span><span class="s8">'center'</span><span class="s1"> }); </span><span class="s7">// Centered title</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span>y_pos = </span><span class="s13">35</span><span class="s4">; </span><span class="s1">// Reset Y position after header</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">55</span><span class="s1">, </span><span class="s13">65</span><span class="s1">, </span><span class="s13">81</span><span class="s1">); </span><span class="s7">// Gray-700</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFontSize(</span><span class="s13">10</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Report Generated: </span><span class="s1">${</span><span class="s10">new</span><span class="s1"> </span><span class="s12">Date</span><span class="s1">().toLocaleDateString()}</span><span class="s8"> at </span><span class="s1">${</span><span class="s10">new</span><span class="s1"> </span><span class="s12">Date</span><span class="s1">().toLocaleTimeString()}</span><span class="s8">`</span><span class="s1">, </span><span class="s13">10</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">10</span><span class="s1">;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// --- Job &amp; Customer Information ---</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFillColor(</span><span class="s13">243</span><span class="s1">, </span><span class="s13">244</span><span class="s1">, </span><span class="s13">246</span><span class="s1">); </span><span class="s7">// Gray-100 for section background</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.rect(</span><span class="s13">10</span><span class="s1">, y_pos - </span><span class="s13">3</span><span class="s1">, </span><span class="s13">190</span><span class="s1">, </span><span class="s13">80</span><span class="s1">, </span><span class="s8">'F'</span><span class="s1">); </span><span class="s7">// Background rectangle for the section</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">30</span><span class="s1">, </span><span class="s13">58</span><span class="s1">, </span><span class="s13">138</span><span class="s1">); </span><span class="s7">// Darker blue for section title</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFontSize(</span><span class="s13">16</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">"Job &amp; Customer Information"</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">10</span><span class="s1">;</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">0</span><span class="s1">, </span><span class="s13">0</span><span class="s1">, </span><span class="s13">0</span><span class="s1">); </span><span class="s7">// Black for main text</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFontSize(</span><span class="s13">12</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Job Date: </span><span class="s1">${jobDate}</span><span class="s8">`</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">7</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Customer: </span><span class="s1">${name}</span><span class="s8">`</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">7</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Email: </span><span class="s1">${email}</span><span class="s8">`</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">7</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Phone: </span><span class="s1">${phone || </span><span class="s8">'N/A'</span><span class="s1">}</span><span class="s8">`</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">10</span><span class="s1">;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">"Address:"</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">5</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s10">const</span><span class="s1"> addressLines = pdf.splitTextToSize(customerAddress, </span><span class="s13">80</span><span class="s1">); </span><span class="s7">// Wrap address if too long</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(addressLines, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += (addressLines.length * </span><span class="s13">6</span><span class="s1">) + </span><span class="s13">10</span><span class="s1">; </span><span class="s7">// Adjust Y based on address lines</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// --- Installation Details ---</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFillColor(</span><span class="s13">243</span><span class="s1">, </span><span class="s13">244</span><span class="s1">, </span><span class="s13">246</span><span class="s1">); </span><span class="s7">// Gray-100 for section background</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.rect(</span><span class="s13">10</span><span class="s1">, y_pos - </span><span class="s13">3</span><span class="s1">, </span><span class="s13">190</span><span class="s1">, </span><span class="s13">45</span><span class="s1">, </span><span class="s8">'F'</span><span class="s1">); </span><span class="s7">// Background rectangle for the section</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">30</span><span class="s1">, </span><span class="s13">58</span><span class="s1">, </span><span class="s13">138</span><span class="s1">); </span><span class="s7">// Darker blue for section title</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFontSize(</span><span class="s13">16</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">"Installation Details"</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">10</span><span class="s1">;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">0</span><span class="s1">, </span><span class="s13">0</span><span class="s1">, </span><span class="s13">0</span><span class="s1">); </span><span class="s7">// Black for main text</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFontSize(</span><span class="s13">12</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Floor Type: </span><span class="s1">${floorType}</span><span class="s8">`</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">7</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Total Area Fitted: </span><span class="s1">${totalArea}</span><span class="s8"> sq. ft./sq. m`</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">7</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">`Fitting Amount: </span><span class="s1">${formattedAmount}</span><span class="s8">`</span><span class="s1">, </span><span class="s13">15</span><span class="s1">, y_pos);</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Add color to fitting amount</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">22</span><span class="s1">, </span><span class="s13">163</span><span class="s1">, </span><span class="s13">74</span><span class="s1">); </span><span class="s7">// Green-600</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(formattedAmount, </span><span class="s13">15</span><span class="s1"> + pdf.getTextWidth(</span><span class="s8">`Fitting Amount: `</span><span class="s1">), y_pos);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">0</span><span class="s1">, </span><span class="s13">0</span><span class="s1">, </span><span class="s13">0</span><span class="s1">); </span><span class="s7">// Reset color</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>y_pos += </span><span class="s13">15</span><span class="s1">;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// --- Footer ---</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setFontSize(</span><span class="s13">10</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.setTextColor(</span><span class="s13">107</span><span class="s1">, </span><span class="s13">114</span><span class="s1">, </span><span class="s13">128</span><span class="s1">); </span><span class="s7">// Gray-500</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.text(</span><span class="s8">"--- End of Flooring Job Report ---"</span><span class="s1">, </span><span class="s13">105</span><span class="s1">, </span><span class="s13">280</span><span class="s1">, { align: </span><span class="s8">'center'</span><span class="s1"> });</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Download the PDF</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s10">const</span><span class="s1"> filename = </span><span class="s8">`Flooring_Report_</span><span class="s1">${name.replace(</span><span class="s6">/\s/</span><span class="s10">g</span><span class="s1">, </span><span class="s8">'_'</span><span class="s1">)}</span><span class="s8">_</span><span class="s1">${jobDate}</span><span class="s8">.pdf`</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>pdf.save(filename);</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Show success message</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>messageBox.textContent = </span><span class="s8">`Successfully generated and downloaded PDF: </span><span class="s1">${filename}</span><span class="s8">`</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>messageBox.classList.remove(</span><span class="s8">'hidden'</span><span class="s1">, </span><span class="s8">'bg-red-100'</span><span class="s1">, </span><span class="s8">'text-red-700'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>messageBox.classList.add(</span><span class="s8">'bg-green-100'</span><span class="s1">, </span><span class="s8">'text-green-700'</span><span class="s1">);</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">                </span></span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s10">catch</span><span class="s1"> (error) {</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>console.error(</span><span class="s8">"PDF Generation Error:"</span><span class="s1">, error);</span></p>
-<p class="p8"><span class="s4"><span class="Apple-converted-space">                </span>messageBox.textContent = </span><span class="s1">'An error occurred during PDF generation. Check console for details.'</span><span class="s4">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>messageBox.classList.remove(</span><span class="s8">'hidden'</span><span class="s1">, </span><span class="s8">'bg-green-100'</span><span class="s1">, </span><span class="s8">'text-green-700'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>messageBox.classList.add(</span><span class="s8">'bg-red-100'</span><span class="s1">, </span><span class="s8">'text-red-700'</span><span class="s1">);</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>} </span><span class="s10">finally</span><span class="s1"> {</span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s1">// Reset button state</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>generateButton.innerHTML = </span><span class="s8">'Generate PDF Report'</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>generateButton.disabled = </span><span class="s10">false</span><span class="s1">;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s1">script</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;/</span><span class="s1">head</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s3">&lt;</span><span class="s6">body</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"bg-gray-100 min-h-screen p-4 sm:p-8 flex items-center justify-center"</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;</span><span class="s6">main</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full max-w-xl bg-white p-6 sm:p-10 rounded-xl shadow-2xl space-y-6"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">h1</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-3xl font-extrabold text-gray-900 border-b pb-2"</span><span class="s3">&gt;</span><span class="s4">Flooring Job Detail Collector</span><span class="s3">&lt;/</span><span class="s6">h1</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">p</span><span class="s1"> </span><span class="s2">class</span><span class="s3">=</span><span class="s5">"text-gray-600"</span><span class="s3">&gt;</span><span class="s1">Enter the job and customer information below to generate a printable **Flooring Job Report**.</span><span class="s3">&lt;/</span><span class="s6">p</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s7">&lt;!-- Message Box --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"messageBox"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"hidden p-4 rounded-lg font-medium transition-all"</span><span class="s4"> </span><span class="s2">role</span><span class="s3">=</span><span class="s1">"alert"</span><span class="s3">&gt;&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;</span><span class="s6">form</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"customerForm"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"space-y-5"</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">h2</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xl font-semibold text-indigo-700"</span><span class="s3">&gt;</span><span class="s4">1. Job Details</span><span class="s3">&lt;/</span><span class="s6">h2</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Job Date --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"jobDate"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Job Date </span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-red-500"</span><span class="s3">&gt;</span><span class="s4">*</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s1"> </span><span class="s2">type</span><span class="s3">=</span><span class="s5">"date"</span><span class="s1"> </span><span class="s2">id</span><span class="s3">=</span><span class="s5">"jobDate"</span><span class="s1"> </span><span class="s2">required</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Customer Address --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"customerAddress"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Customer Address </span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-red-500"</span><span class="s3">&gt;</span><span class="s4">*</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">textarea</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"customerAddress"</span><span class="s4"> </span><span class="s2">rows</span><span class="s3">=</span><span class="s1">"3"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"Street Address, City, Postcode"</span><span class="s4"> </span><span class="s2">required</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"</span><span class="s3">&gt;&lt;/</span><span class="s6">textarea</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">h2</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xl font-semibold text-indigo-700 pt-4 border-t"</span><span class="s3">&gt;</span><span class="s4">2. Installation &amp; Financials</span><span class="s3">&lt;/</span><span class="s6">h2</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Floor Type --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"floorType"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Floor Type </span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-red-500"</span><span class="s3">&gt;</span><span class="s4">*</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">select</span><span class="s1"> </span><span class="s2">id</span><span class="s3">=</span><span class="s5">"floorType"</span><span class="s1"> </span><span class="s2">required</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">option</span><span class="s1"> </span><span class="s2">value</span><span class="s3">=</span><span class="s5">""</span><span class="s1"> </span><span class="s2">disabled</span><span class="s1"> </span><span class="s2">selected</span><span class="s3">&gt;</span><span class="s1">Select the material type</span><span class="s3">&lt;/</span><span class="s6">option</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">option</span><span class="s1"> </span><span class="s2">value</span><span class="s3">=</span><span class="s5">"Laminated"</span><span class="s3">&gt;</span><span class="s1">Laminated</span><span class="s3">&lt;/</span><span class="s6">option</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">option</span><span class="s1"> </span><span class="s2">value</span><span class="s3">=</span><span class="s5">"SPC"</span><span class="s3">&gt;</span><span class="s1">SPC (Stone Plastic Composite)</span><span class="s3">&lt;/</span><span class="s6">option</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">option</span><span class="s1"> </span><span class="s2">value</span><span class="s3">=</span><span class="s5">"LVT"</span><span class="s3">&gt;</span><span class="s1">LVT (Luxury Vinyl Tile)</span><span class="s3">&lt;/</span><span class="s6">option</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                    </span></span><span class="s3">&lt;</span><span class="s6">option</span><span class="s1"> </span><span class="s2">value</span><span class="s3">=</span><span class="s5">"Herringbone"</span><span class="s3">&gt;</span><span class="s1">Herringbone (Pattern)</span><span class="s3">&lt;/</span><span class="s6">option</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;/</span><span class="s6">select</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Total Area Fitted --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"totalArea"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Total Area Fitted (e.g., in sq. ft. or sq. m) </span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-red-500"</span><span class="s3">&gt;</span><span class="s4">*</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"number"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"totalArea"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"e.g., 150.5"</span><span class="s4"> </span><span class="s2">required</span><span class="s4"> </span><span class="s2">min</span><span class="s3">=</span><span class="s1">"0.01"</span><span class="s4"> </span><span class="s2">step</span><span class="s3">=</span><span class="s1">"0.01"</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Total Fitting Amount --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"fittingAmount"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Total Fitting Amount (Money Taken) </span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-red-500"</span><span class="s3">&gt;</span><span class="s4">*</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"number"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"fittingAmount"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"e.g., 550.00"</span><span class="s4"> </span><span class="s2">required</span><span class="s4"> </span><span class="s2">min</span><span class="s3">=</span><span class="s1">"0.01"</span><span class="s4"> </span><span class="s2">step</span><span class="s3">=</span><span class="s1">"0.01"</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;</span><span class="s6">h2</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-xl font-semibold text-indigo-700 pt-4 border-t"</span><span class="s3">&gt;</span><span class="s4">3. Customer Contact</span><span class="s3">&lt;/</span><span class="s6">h2</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Customer Name --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"customerName"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Full Name </span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-red-500"</span><span class="s3">&gt;</span><span class="s4">*</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"text"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"customerName"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"John Doe"</span><span class="s4"> </span><span class="s2">required</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Customer Email --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"customerEmail"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Email Address </span><span class="s3">&lt;</span><span class="s6">span</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"text-red-500"</span><span class="s3">&gt;</span><span class="s4">*</span><span class="s3">&lt;/</span><span class="s6">span</span><span class="s3">&gt;&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"email"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"customerEmail"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"john.doe@example.com"</span><span class="s4"> </span><span class="s2">required</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s1">&lt;!-- Customer Phone --&gt;</span><span class="s3">&lt;</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">label</span><span class="s4"> </span><span class="s2">for</span><span class="s3">=</span><span class="s1">"customerPhone"</span><span class="s4"> </span><span class="s2">class</span><span class="s3">=</span><span class="s1">"block text-sm font-medium text-gray-700 mb-1"</span><span class="s3">&gt;</span><span class="s4">Phone Number (Optional)</span><span class="s3">&lt;/</span><span class="s6">label</span><span class="s3">&gt;</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s3">&lt;</span><span class="s6">input</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"tel"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"customerPhone"</span><span class="s4"> </span><span class="s2">placeholder</span><span class="s3">=</span><span class="s1">"(123) 456-7890"</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                    </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">div</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">            </span></span><span class="s7">&lt;!-- Generate Button --&gt;</span><span class="s3">&lt;</span><span class="s6">button</span><span class="s4"> </span><span class="s2">type</span><span class="s3">=</span><span class="s1">"button"</span><span class="s4"> </span><span class="s2">onclick</span><span class="s3">=</span><span class="s1">"generatePDF()"</span><span class="s4"> </span><span class="s2">id</span><span class="s3">=</span><span class="s1">"generateButton"</span></p>
-<p class="p4"><span class="s4"><span class="Apple-converted-space">                </span></span><span class="s2">class</span><span class="s3">=</span><span class="s1">"w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out transform hover:scale-[1.01]"</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">                </span>Generate PDF Report</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">            </span></span><span class="s3">&lt;/</span><span class="s6">button</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">        </span></span><span class="s3">&lt;/</span><span class="s6">form</span><span class="s3">&gt;</span></p>
-<p class="p5"><span class="s1"><span class="Apple-converted-space">    </span></span><span class="s3">&lt;/</span><span class="s6">main</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
-<p class="p6"><span class="s4"><span class="Apple-converted-space">    </span></span><span class="s1">&lt;!-- The pdfContent div is no longer needed for rendering the PDF with html2canvas --&gt;&lt;!-- &lt;div id="pdfContent" style="position: absolute; left: -9999px; top: -9999px;"&gt;&lt;/div&gt; --&gt;</span><span class="s3">&lt;/</span><span class="s6">body</span><span class="s3">&gt;</span></p>
-<p class="p2"><span class="s3">&lt;/</span><span class="s1">html</span><span class="s3">&gt;</span></p>
-<p class="p7"><span class="s11"></span><br></p>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Application Container -->
+    <div id="app-container" class="w-full max-w-4xl bg-white shadow-2xl rounded-xl p-6 md:p-10 transition-all duration-300">
+        <h1 class="text-3xl font-extrabold text-indigo-700 mb-2">💪 Workout Tracker</h1>
+        <p class="text-gray-500 mb-6">Log your lifts and track your progress over time.</p>
+
+        <!-- Loading/Error Indicator -->
+        <div id="status-message" class="text-center p-4 bg-yellow-100 text-yellow-800 rounded-lg mb-6 hidden">
+            Initializing application...
+        </div>
+
+        <!-- User Information -->
+        <div class="mb-6 p-3 bg-gray-50 rounded-lg text-sm text-gray-600 border-l-4 border-indigo-400">
+            Authenticated User ID: <span id="user-id" class="font-mono text-gray-800 break-all text-xs md:text-sm">...</span>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-gray-200 mb-6">
+            <button onclick="showView('log')" id="tab-log" class="py-3 px-6 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600 hover:text-indigo-800 transition duration-150">Log Workout</button>
+            <button onclick="showView('history')" id="tab-history" class="py-3 px-6 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 transition duration-150">History & Compare</button>
+        </div>
+
+        <!-- 1. Log Workout View -->
+        <div id="view-log" class="view-content">
+            <form id="log-form" class="space-y-4">
+                <div>
+                    <label for="exercise" class="block text-sm font-medium text-gray-700">Exercise Name (e.g., Bench Press, Squat)</label>
+                    <input type="text" id="exercise" required placeholder="Bench Press, Squat, Run" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-3 border focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <!-- Sets Container -->
+                <div id="sets-container" class="space-y-3 border border-dashed border-indigo-300 p-4 rounded-lg bg-indigo-50">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="text-md font-bold text-indigo-800">Sets Details</h3>
+                    </div>
+                    <!-- Set rows will be dynamically added here -->
+                </div>
+
+                <button type="button" onclick="addSetRow()" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 flex items-center space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Add Another Set</span>
+                </button>
+
+                <button type="submit" id="log-button" class="w-full py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 disabled:opacity-50" disabled>
+                    Log Workout
+                </button>
+                <p id="form-feedback" class="text-sm text-center text-green-600 mt-2 hidden"></p>
+            </form>
+        </div>
+
+        <!-- 2. History & Compare View -->
+        <div id="view-history" class="view-content hidden">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Workout History</h2>
+
+            <!-- Filter Buttons -->
+            <div class="flex space-x-2 mb-4">
+                <button onclick="setFilter('all')" class="filter-btn bg-indigo-600 text-white px-3 py-1 text-sm rounded-full transition duration-150">All Time</button>
+                <button onclick="setFilter('week')" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full hover:bg-gray-300 transition duration-150">Last 7 Days</button>
+                <button onclick="setFilter('month')" class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full hover:bg-gray-300 transition duration-150">Last 30 Days</button>
+            </div>
+
+            <!-- Comparison Statistics -->
+            <div id="comparison-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Stats will be populated here -->
+            </div>
+
+            <!-- Workout List -->
+            <div id="workout-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                <p class="text-gray-500 text-center" id="empty-state">No workouts logged yet. Start logging in the other tab!</p>
+                <!-- Workouts will be listed here -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+        // IMPORTANT: Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth;
+        let userId = null;
+        let allWorkouts = []; // Cache all workouts for comparison
+        let currentFilter = 'all';
+
+        const statusMessage = document.getElementById('status-message');
+        const userIdDisplay = document.getElementById('user-id');
+        const logButton = document.getElementById('log-button');
+        const logForm = document.getElementById('log-form');
+        const feedbackMessage = document.getElementById('form-feedback');
+        const workoutList = document.getElementById('workout-list');
+        const comparisonStats = document.getElementById('comparison-stats');
+        const emptyState = document.getElementById('empty-state');
+        const setsContainer = document.getElementById('sets-container'); // New reference
+
+        // --- Utility Functions ---
+
+        function showMessage(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
+            statusMessage.classList.add(isError ? 'bg-red-100' : 'bg-yellow-100', isError ? 'text-red-800' : 'text-yellow-800');
+            if (!isError) {
+                // Hide success/info messages after a few seconds
+                setTimeout(() => statusMessage.classList.add('hidden'), 5000);
+            }
+        }
+
+        // Helper to format Date objects
+        function formatDate(timestamp) {
+            const date = timestamp instanceof Timestamp ? timestamp.toDate() : timestamp;
+            return date.toLocaleString('en-US', {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        // --- Authentication and Initialization ---
+
+        async function initFirebase() {
+            if (!firebaseConfig) {
+                showMessage("ERROR: Firebase configuration is missing. Cannot initialize application.", true);
+                return;
+            }
+
+            setLogLevel('debug'); // Enable Firestore logging
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        userIdDisplay.textContent = userId;
+                        logButton.disabled = false;
+                        showMessage("Successfully connected to Firebase. Ready to log workouts.", false);
+                        setupFirestoreListener(); // Start listening for data
+                        statusMessage.classList.add('hidden'); // Hide status message on success
+                        addSetRow(); // Add the initial set row
+                    } else {
+                        showMessage("Authentication failed. Please check environment settings.", true);
+                        userIdDisplay.textContent = 'Not Authenticated';
+                    }
+                });
+            } catch (error) {
+                showMessage(`Authentication error: ${error.message}`, true);
+                console.error("Firebase Auth Error:", error);
+            }
+        }
+
+        // --- Dynamic Set Input Handling ---
+
+        function updateSetNumbers() {
+            const rows = setsContainer.querySelectorAll('.set-row');
+            rows.forEach((row, index) => {
+                const label = row.querySelector('.set-label');
+                if (label) {
+                    label.textContent = `Set ${index + 1}`;
+                }
+                const removeBtn = row.querySelector('.remove-set-btn');
+                removeBtn.disabled = rows.length === 1; // Cannot remove the last set
+            });
+        }
+
+        function addSetRow() {
+            const newRow = document.createElement('div');
+            newRow.className = 'set-row grid grid-cols-12 gap-3 items-end p-2 bg-white rounded-md shadow-sm border border-gray-100';
+            newRow.innerHTML = `
+                <div class="col-span-2">
+                    <p class="text-sm font-bold text-indigo-700 set-label"></p>
+                </div>
+                <div class="col-span-4">
+                    <label class="block text-xs font-medium text-gray-500">Weight (kg/lbs)</label>
+                    <input type="number" name="weight" min="1" placeholder="e.g., 100" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                </div>
+                <div class="col-span-4">
+                    <label class="block text-xs font-medium text-gray-500">Reps/Duration</label>
+                    <input type="text" name="reps" placeholder="e.g., 8 reps or 30 mins" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                </div>
+                <div class="col-span-2">
+                    <button type="button" onclick="removeSet(this)" class="remove-set-btn w-full py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition duration-150 text-sm" title="Remove Set">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+            setsContainer.appendChild(newRow);
+            updateSetNumbers();
+        }
+
+        window.addSetRow = addSetRow;
+
+        function removeSet(buttonElement) {
+            const row = buttonElement.closest('.set-row');
+            if (setsContainer.querySelectorAll('.set-row').length > 1) {
+                row.remove();
+                updateSetNumbers();
+            }
+        }
+
+        window.removeSet = removeSet;
+
+        // --- Data Persistence (Firestore) ---
+
+        function getCollectionPath() {
+            // Private data storage path: /artifacts/{appId}/users/{userId}/{collectionName}
+            return `artifacts/${appId}/users/${userId}/workouts`;
+        }
+
+        async function saveWorkout(data) {
+            if (!userId) {
+                showMessage("Authentication not ready. Please wait.", true);
+                return;
+            }
+            try {
+                const path = getCollectionPath();
+                await addDoc(collection(db, path), {
+                    ...data,
+                    timestamp: Timestamp.now()
+                });
+                return true;
+            } catch (error) {
+                showMessage(`Failed to save workout: ${error.message}`, true);
+                console.error("Firestore Save Error:", error);
+                return false;
+            }
+        }
+
+        async function deleteWorkout(id) {
+            if (!userId) return;
+            try {
+                const path = getCollectionPath();
+                await deleteDoc(doc(db, path, id));
+                showMessage("Workout deleted successfully!", false);
+            } catch (error) {
+                showMessage(`Failed to delete workout: ${error.message}`, true);
+                console.error("Firestore Delete Error:", error);
+            }
+        }
+
+
+        // Set up real-time listener for workouts
+        function setupFirestoreListener() {
+            if (!db || !userId) return;
+
+            const path = getCollectionPath();
+            // Query: Get all documents, ordered by timestamp descending (newest first)
+            const workoutsQuery = query(collection(db, path), orderBy("timestamp", "desc"));
+
+            // onSnapshot provides real-time updates
+            onSnapshot(workoutsQuery, (snapshot) => {
+                const fetchedWorkouts = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                allWorkouts = fetchedWorkouts; // Update the cache
+                renderWorkouts(); // Re-render the UI based on current filter
+            }, (error) => {
+                showMessage(`Error fetching real-time data: ${error.message}`, true);
+                console.error("Firestore Listener Error:", error);
+            });
+        }
+
+
+        // --- UI Rendering and Logic ---
+
+        function showView(viewName) {
+            document.querySelectorAll('.view-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('border-indigo-600', 'text-indigo-600');
+                el.classList.add('border-transparent', 'text-gray-500');
+            });
+            document.getElementById(`tab-${viewName}`).classList.remove('border-transparent', 'text-gray-500');
+            document.getElementById(`tab-${viewName}`).classList.add('border-indigo-600', 'text-indigo-600');
+
+            if (viewName === 'history') {
+                renderWorkouts(); // Ensure history is updated when view is opened
+            }
+        }
+
+        window.showView = showView; // Make globally accessible
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(filter === 'all' ? 'all time' : filter === 'week' ? '7 days' : '30 days')) {
+                    btn.classList.remove('bg-gray-200', 'text-gray-700');
+                    btn.classList.add('bg-indigo-600', 'text-white');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+            renderWorkouts();
+        }
+
+        window.setFilter = setFilter; // Make globally accessible
+
+        function getFilteredWorkouts() {
+            const now = new Date().getTime();
+            let cutoffTime = 0;
+
+            if (currentFilter === 'week') {
+                cutoffTime = now - (7 * 24 * 60 * 60 * 1000); // 7 days ago
+            } else if (currentFilter === 'month') {
+                cutoffTime = now - (30 * 24 * 60 * 60 * 1000); // 30 days ago
+            }
+
+            return allWorkouts.filter(w => {
+                // Handle older/corrupted data that might not have a proper timestamp structure
+                if (!w.timestamp || typeof w.timestamp.toDate !== 'function') return false;
+
+                const workoutTime = w.timestamp.toDate().getTime();
+                return currentFilter === 'all' || workoutTime > cutoffTime;
+            });
+        }
+
+        function calculateComparisonStats(workouts) {
+            if (workouts.length === 0) {
+                return {
+                    totalLogs: 0,
+                    uniqueExercises: 0,
+                    heavyLift: { exercise: 'N/A', weight: 0 }
+                };
+            }
+
+            const totalLogs = workouts.length;
+            const uniqueExercises = new Set(workouts.map(w => w.exercise)).size;
+
+            let heaviestLift = { exercise: 'N/A', weight: 0 };
+
+            // Iterate over all workouts, and for each workout, iterate over all sets
+            workouts.forEach(w => {
+                // Ensure w.sets is an array before trying to iterate
+                if (Array.isArray(w.sets)) {
+                    w.sets.forEach(set => {
+                        const weight = parseFloat(set.weight);
+                        if (!isNaN(weight) && weight > heaviestLift.weight) {
+                            heaviestLift = {
+                                exercise: w.exercise, // The exercise name from the parent workout
+                                weight: weight
+                            };
+                        }
+                    });
+                }
+            });
+
+            return { totalLogs, uniqueExercises, heaviestLift };
+        }
+
+        function renderComparisonStats(stats) {
+            // Added a defensive fallback for heavyLift to prevent TypeError
+            const heavyLift = stats.heavyLift || { exercise: 'N/A', weight: 0 };
+
+            comparisonStats.innerHTML = `
+                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-xs font-medium text-blue-600">Total Exercise Logs</p>
+                    <p class="text-2xl font-bold text-blue-800">${stats.totalLogs}</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <p class="text-xs font-medium text-green-600">Unique Exercises</p>
+                    <p class="text-2xl font-bold text-green-800">${stats.uniqueExercises}</p>
+                </div>
+                <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <p class="text-xs font-medium text-purple-600">Heaviest Set Weight</p>
+                    <p class="text-xl font-bold text-purple-800 truncate">${heavyLift.weight} (${heavyLift.exercise})</p>
+                </div>
+            `;
+        }
+
+
+        function renderWorkouts() {
+            const filteredWorkouts = getFilteredWorkouts();
+            const stats = calculateComparisonStats(filteredWorkouts);
+            renderComparisonStats(stats);
+
+            if (filteredWorkouts.length === 0) {
+                workoutList.innerHTML = '<p class="text-gray-500 text-center p-4">No workouts found for this period.</p>';
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            const html = filteredWorkouts.map(workout => {
+                // Handle cases where 'sets' might not be an array (for new data structure consistency)
+                const sets = Array.isArray(workout.sets) ? workout.sets : [];
+
+                const setsHtml = sets.map((set, index) => `
+                    <div class="flex justify-between text-sm text-gray-600 py-0.5 border-b border-gray-100 last:border-b-0">
+                        <span class="font-medium text-indigo-700 w-1/5">Set ${index + 1}:</span>
+                        <span class="w-2/5">${set.weight} kg/lbs</span>
+                        <span class="w-2/5">${set.reps}</span>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="p-4 bg-white rounded-lg border shadow-md">
+                        <div class="flex items-start justify-between mb-2 pb-2 border-b border-gray-200">
+                            <div>
+                                <p class="text-xl font-bold text-indigo-700">${workout.exercise}</p>
+                                <p class="text-xs text-gray-500">${formatDate(workout.timestamp)}</p>
+                            </div>
+                            <button onclick="deleteWorkout('${workout.id}')"
+                                    class="text-red-500 hover:text-red-700 p-2 rounded-full transition duration-150"
+                                    title="Delete Log">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-semibold text-gray-800 bg-gray-100 p-1 rounded-sm">
+                                <span class="w-1/5">SET</span>
+                                <span class="w-2/5">WEIGHT</span>
+                                <span class="w-2/5">REPS/DURATION</span>
+                            </div>
+                            ${setsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            workoutList.innerHTML = html;
+        }
+
+        window.deleteWorkout = deleteWorkout; // Make globally accessible
+
+        // --- Event Listeners ---
+
+        logForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            logButton.disabled = true;
+            logButton.textContent = 'Logging...';
+            feedbackMessage.classList.add('hidden');
+
+            const exercise = document.getElementById('exercise').value.trim();
+            const setRows = setsContainer.querySelectorAll('.set-row');
+
+            const sets = Array.from(setRows).map(row => {
+                return {
+                    weight: row.querySelector('input[name="weight"]').value,
+                    reps: row.querySelector('input[name="reps"]').value.trim()
+                };
+            }).filter(set => set.weight && set.reps); // Only include sets that have both values
+
+            if (sets.length === 0) {
+                logButton.disabled = false;
+                logButton.textContent = 'Log Workout';
+                showMessage("Please add at least one valid set to log.", true);
+                return;
+            }
+
+            const workoutData = {
+                exercise: exercise,
+                sets: sets // Store the array of sets
+            };
+
+            const success = await saveWorkout(workoutData);
+
+            if (success) {
+                feedbackMessage.textContent = `${exercise} (${sets.length} sets) logged successfully!`;
+                feedbackMessage.classList.remove('hidden');
+                logForm.reset();
+                setsContainer.innerHTML = ''; // Clear sets container
+                addSetRow(); // Add back one initial row
+                // Automatically switch to history view after logging
+                showView('history');
+            } else {
+                feedbackMessage.textContent = `Error logging workout.`;
+                feedbackMessage.classList.remove('text-green-600');
+                feedbackMessage.classList.add('text-red-600', 'hidden');
+            }
+
+            logButton.disabled = false;
+            logButton.textContent = 'Log Workout';
+
+            setTimeout(() => {
+                feedbackMessage.classList.add('hidden');
+                feedbackMessage.classList.remove('text-red-600');
+                feedbackMessage.classList.add('text-green-600');
+            }, 5000);
+        });
+
+        // Initialize on window load
+        window.onload = function() {
+            showMessage("Starting Firebase initialization...");
+            initFirebase();
+            setFilter('all'); // Set default filter
+        };
+
+    </script>
 </body>
 </html>
