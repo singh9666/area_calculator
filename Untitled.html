@@ -5,28 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Fitness Logger</title>
     <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com">// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
-  authDomain: "gymlog-3ef3b.firebaseapp.com",
-  projectId: "gymlog-3ef3b",
-  storageBucket: "gymlog-3ef3b.firebasestorage.app",
-  messagingSenderId: "139587565969",
-  appId: "1:139587565969:web:90bf938d213afbc81e0230",
-  measurementId: "G-5DZYYM4YN2"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Use Inter font -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -122,16 +101,14 @@ const analytics = getAnalytics(app);
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
         // --- FIREBASE CONFIGURATION (FOR GITHUB/LOCAL USE) ---
-        // 🚨 IMPORTANT: If running this file outside the Canvas environment (like on GitHub Pages),
-        // you MUST replace the placeholder values below with your actual Firebase project configuration.
+        // This configuration will be used when the app is run outside the Canvas environment (e.g., GitHub Pages).
         const myFirebaseConfig = {
-             // Replace these placeholders with your actual config from the Firebase console
-            apiKey: "YOUR_API_KEY", 
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw", 
+            authDomain: "gymlog-3ef3b.firebaseapp.com",
+            projectId: "gymlog-3ef3b",
+            storageBucket: "gymlog-3ef3b.firebasestorage.app",
+            messagingSenderId: "139587565969",
+            appId: "1:139587565969:web:90bf938d213afbc81e0230"
         };
         
         // --- ENVIRONMENT HANDLING (Prioritize Canvas Globals, Fallback to Local Config) ---
@@ -204,6 +181,7 @@ const analytics = getAnalytics(app);
             setLogLevel('debug'); // Enable Firestore logging
 
             // Check if config is placeholder and warn the user if running outside Canvas
+            // This check now relies on the correctly configured myFirebaseConfig fallback
             if (Object.keys(firebaseConfig).length === 0 || firebaseConfig.apiKey === "YOUR_API_KEY") {
                  showMessage("Error: Firebase configuration is missing or is using placeholder values. Data persistence will NOT work on GitHub.", true);
                  return;
