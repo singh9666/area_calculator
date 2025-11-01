@@ -158,8 +158,25 @@
         // --- GLOBAL SETUP ---
         // Firestore will be used for all persistent data storage.
         
+        // Your hardcoded Firebase configuration (for local use)
+        const LOCAL_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
+            authDomain: "gymlog-3ef3b.firebaseapp.com",
+            projectId: "gymlog-3ef3b",
+            storageBucket: "gymlog-3ef3b.firebasestorage.app",
+            messagingSenderId: "139587565969",
+            appId: "1:139587565969:web:90bf938d213afbc81e0230",
+            measurementId: "G-5DZYYM4YN2"
+        };
+
+        // 1. Prioritize secure environment variable if available
+        const environmentConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        
+        // 2. Fallback to hardcoded config if environment variable is missing
+        const firebaseConfig = environmentConfig || LOCAL_FIREBASE_CONFIG;
+
+
         // Global variables provided by the environment (Mandatory usage)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-gym-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
@@ -206,7 +223,7 @@
         // --- 1. FIREBASE INITIALIZATION & AUTH ---
 
         async function initFirebaseAndAuth() {
-            if (!firebaseConfig) {
+            if (!firebaseConfig || !firebaseConfig.apiKey) {
                 console.error("Firebase configuration is missing. Cannot initialize app.");
                 userIdDisplay.textContent = 'ERROR: No Firebase Config.';
                 return;
@@ -590,9 +607,6 @@
             if (e.target.closest('.delete-workout-btn') && isAuthReady) {
                 const button = e.target.closest('.delete-workout-btn');
                 const workoutId = button.dataset.id;
-                
-                // Simple confirmation logic (replace with modal UI in production)
-                // Since alerts are forbidden, we rely on the user understanding the button click
                 
                 try {
                     const docRef = doc(db, `artifacts/${appId}/users/${userId}/workouts`, workoutId);
