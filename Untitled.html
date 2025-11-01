@@ -3,109 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gym Log Tracker</title>
+    <title>Personal Gym Log</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        /* Custom styles for better look and feel */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
-            min-height: 100vh;
+            background-color: #f7f9fb;
+        }
+        .container {
+            max-width: 900px;
         }
         .card {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s;
         }
-        .btn-primary {
-            transition: background-color 0.2s;
+        .card:hover {
+            transform: translateY(-2px);
         }
-        .btn-primary:hover {
-            background-color: #2563eb;
+        .input-field {
+            border-bottom: 2px solid #3b82f6;
+            transition: border-color 0.3s;
         }
-        .set-input-group input {
-            transition: border-color 0.2s;
-        }
-        .set-input-group input:focus {
+        .input-field:focus {
+            border-bottom-color: #1d4ed8;
             outline: none;
-            border-color: #3b82f6;
+        }
+        .log-button {
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .log-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        .log-button:active {
+            transform: translateY(0);
         }
     </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="p-4 sm:p-8">
+<body class="bg-gray-50 min-h-screen py-8">
+    <div class="container mx-auto px-4">
+        <!-- HEADER -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">🏋️ Personal Gym Log</h1>
+            <p class="text-gray-500 mt-2">Track your progress and manage your exercises with real-time data persistence.</p>
+        </header>
 
-    <div class="max-w-4xl mx-auto space-y-8">
-        <h1 class="text-4xl font-bold text-gray-800 text-center mb-8">Gym Workout Tracker</h1>
-
-        <!-- User/Auth Status Header -->
-        <div id="status-header" class="flex justify-between items-center p-3 bg-white rounded-xl shadow-md hidden">
-            <p id="user-display" class="text-base font-medium text-gray-700"></p>
-            <button id="sign-out-button" class="bg-red-500 text-white text-sm py-1 px-3 rounded-lg hover:bg-red-600 transition duration-200 hidden">
-                Sign Out
-            </button>
-        </div>
-
-        <!-- AUTHENTICATION VIEW (SIGN IN / SIGN UP) -->
-        <div id="auth-view" class="flex flex-col items-center justify-center p-6 bg-white rounded-xl card max-w-md mx-auto hidden">
-            <h2 id="auth-title" class="text-3xl font-bold mb-6 text-gray-800">Sign In</h2>
-            <input type="email" id="auth-email" placeholder="Email" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            <input type="password" id="auth-password" placeholder="Password" class="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-            <p id="auth-error-message" class="text-red-500 mb-4 text-center hidden"></p>
-            <button id="auth-button" class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">Sign In</button>
-            <button id="toggle-auth-mode" class="mt-4 text-sm text-blue-600 hover:text-blue-800">Need an account? Sign Up</button>
-        </div>
-        
-        <!-- MAIN WORKOUT VIEW (HIDDEN until authenticated) -->
-        <div id="workout-view" class="space-y-8 hidden">
-            
-            <!-- Workout Logging Section -->
-            <div id="log-workout-section" class="card bg-white p-6 rounded-xl">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-3">Log Your Session</h2>
-
-                <div id="feedback-message" class="hidden p-3 mb-4 rounded-lg text-sm font-medium transition duration-300"></div>
-
-                <!-- Dynamic Exercise Input Container -->
-                <div id="exercises-container" class="space-y-6 mb-6">
-                    <!-- Exercise blocks will be added here -->
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex flex-wrap gap-3 mb-8">
-                    <button id="add-exercise-btn" class="flex-1 min-w-[150px] bg-indigo-500 text-white p-3 rounded-lg font-semibold hover:bg-indigo-600 transition">
-                        Add Single Exercise
-                    </button>
-                    <button id="add-superset-btn" class="flex-1 min-w-[150px] bg-pink-500 text-white p-3 rounded-lg font-semibold hover:bg-pink-600 transition">
-                        Add Superset
-                    </button>
-                </div>
-
-                <button id="log-workout-btn" class="w-full bg-blue-600 text-white p-4 rounded-lg font-bold text-lg btn-primary">
-                    Log Workout
-                </button>
-            </div>
-
-            <!-- EXERCISE LIBRARY MANAGEMENT (New Section) -->
-            <div id="library-section" class="card bg-white p-6 rounded-xl">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-3">Exercise Library (Click to Quick-Add)</h2>
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- LEFT COLUMN: LOGGING & LIBRARY -->
+            <div class="lg:w-1/2 space-y-8">
                 
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="new-exercise-name" placeholder="New exercise name (e.g., Squat)" 
-                           class="flex-grow p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    <button id="add-library-btn" class="bg-green-500 text-white p-2 rounded-lg font-semibold hover:bg-green-600 transition">Add</button>
-                </div>
+                <!-- WORKOUT LOGGING SECTION -->
+                <section id="workout-logging-card" class="card bg-white p-6 rounded-xl border border-gray-200">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Today's Workout</h2>
 
-                <div id="library-container" class="space-y-2">
-                    <p class="text-center text-gray-500" id="loading-library">Loading library...</p>
-                    <!-- Library exercises will be rendered here -->
-                </div>
+                    <!-- Exercise Selection Form -->
+                    <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                        <select id="exercise-select" class="w-full sm:w-1/2 p-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                            <option value="" disabled selected>Select or type exercise...</option>
+                            <!-- Library options will be added here -->
+                        </select>
+                        <input type="text" id="custom-exercise-input" placeholder="Type new exercise name" class="w-full sm:w-1/2 p-3 border border-gray-300 rounded-lg input-field">
+                    </div>
+
+                    <!-- Set/Rep/Weight Inputs -->
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <input type="number" id="sets-input" placeholder="Sets" class="p-3 border border-gray-300 rounded-lg input-field text-center" min="1">
+                        <input type="number" id="reps-input" placeholder="Reps" class="p-3 border border-gray-300 rounded-lg input-field text-center" min="1">
+                        <input type="number" id="weight-input" placeholder="Weight (kg/lbs)" class="p-3 border border-gray-300 rounded-lg input-field text-center" min="0">
+                    </div>
+
+                    <button id="add-set-btn" class="w-full bg-indigo-500 text-white p-3 rounded-lg font-medium hover:bg-indigo-600 transition duration-150 shadow-md">
+                        Add Set to Current Exercise
+                    </button>
+
+                    <div id="current-exercise-details" class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">Current Exercise: <span id="current-exercise-name" class="font-bold"></span></h3>
+                        <div id="set-list" class="space-y-2">
+                            <!-- Sets will be listed here -->
+                        </div>
+                        <button id="finish-exercise-btn" class="mt-3 w-full bg-yellow-500 text-white p-2 rounded-lg font-medium hover:bg-yellow-600 transition duration-150">
+                            Finish Exercise
+                        </button>
+                    </div>
+
+                    <div id="workout-summary" class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h3 class="text-xl font-semibold text-blue-800 mb-2">Workout in Progress</h3>
+                        <div id="completed-exercises-list" class="space-y-3">
+                            <!-- Completed exercises for the current session go here -->
+                            <p class="text-gray-600" id="no-exercises-message">Start adding exercises!</p>
+                        </div>
+                    </div>
+                    
+                    <button id="log-workout-btn" class="w-full log-button bg-green-500 text-white text-lg p-3 rounded-xl font-bold mt-6 hover:bg-green-600 transition duration-150 shadow-lg">
+                        Log Workout
+                    </button>
+                    <p id="feedback-message" class="mt-2 text-center text-sm font-medium hidden text-green-600"></p>
+                </section>
+                
+                <!-- EXERCISE LIBRARY MANAGEMENT SECTION -->
+                <section id="library-management-card" class="card bg-white p-6 rounded-xl border border-gray-200">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Exercise Library</h2>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="new-library-exercise-input" placeholder="New exercise name" class="flex-grow p-3 border border-gray-300 rounded-lg input-field">
+                        <button id="add-library-btn" class="bg-primary text-white p-3 rounded-lg font-medium hover:bg-indigo-600 transition duration-150">
+                            Add
+                        </button>
+                    </div>
+                    <div id="exercise-library-list" class="space-y-2 max-h-64 overflow-y-auto p-2 bg-gray-50 rounded-lg border border-gray-200">
+                        <!-- Library items displayed here -->
+                    </div>
+                </section>
+                
             </div>
 
-            <!-- Workout History Section -->
-            <div id="history-section" class="card bg-white p-6 rounded-xl">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-6 border-b pb-3">Workout History</h2>
-                <div id="history-container" class="space-y-4">
-                    <p class="text-center text-gray-500" id="loading-history">Loading history...</p>
-                    <!-- History records will be rendered here -->
-                </div>
+            <!-- RIGHT COLUMN: HISTORY -->
+            <div class="lg:w-1/2">
+                <section id="history-card" class="card bg-white p-6 rounded-xl border border-gray-200 min-h-full">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700">Workout History</h2>
+                    <p class="text-xs text-gray-500 mb-4">User ID: <span id="user-id-display" class="font-mono text-gray-700">Loading...</span></p>
+
+                    <div id="workout-history-list" class="space-y-6">
+                        <p id="loading-history" class="text-center text-gray-500">Loading history...</p>
+                        <!-- Workout logs will be dynamically inserted here -->
+                    </div>
+                </section>
             </div>
         </div>
     </div>
@@ -113,483 +148,344 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, doc, setDoc, onSnapshot, collection, query, 
+            serverTimestamp, deleteDoc, runTransaction, getDocs 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- GLOBAL SETUP ---
+        // Firestore will be used for all persistent data storage.
+        
         // Global variables provided by the environment (Mandatory usage)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-gym-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
+        
         let db;
         let auth;
         let userId = null;
         let isAuthReady = false;
-        let isSigningUp = false; 
-
-        // --- DOM Elements ---
-        const authView = document.getElementById('auth-view');
-        const workoutView = document.getElementById('workout-view');
-        const userDisplay = document.getElementById('user-display');
-        const signOutButton = document.getElementById('sign-out-button');
-        const statusHeader = document.getElementById('status-header');
         
-        const exercisesContainer = document.getElementById('exercises-container');
-        const logWorkoutBtn = document.getElementById('log-workout-btn');
+        // State for the current workout session
+        let currentExerciseName = null;
+        let currentExerciseSets = [];
+        let completedExercises = [];
+
+        // DOM Elements
+        const workoutSummary = document.getElementById('workout-summary');
+        const setList = document.getElementById('set-list');
+        const currentExerciseDetails = document.getElementById('current-exercise-details');
+        const currentExerciseNameEl = document.getElementById('current-exercise-name');
+        const completedExercisesList = document.getElementById('completed-exercises-list');
+        const noExercisesMessage = document.getElementById('no-exercises-message');
+        const exerciseSelect = document.getElementById('exercise-select');
+        const newLibraryExerciseInput = document.getElementById('new-library-exercise-input');
+        const exerciseLibraryList = document.getElementById('exercise-library-list');
         const feedbackMessage = document.getElementById('feedback-message');
-        const historyContainer = document.getElementById('history-container');
-        const loadingHistory = document.getElementById('loading-history');
-        
-        // Library DOM elements
-        const libraryContainer = document.getElementById('library-container');
-        const newExerciseInput = document.getElementById('new-exercise-name');
-        const addLibraryBtn = document.getElementById('add-library-btn');
-        const loadingLibrary = document.getElementById('loading-library');
+        const userIdDisplay = document.getElementById('user-id-display');
 
-        // Helper function for exponential backoff retry logic
-        async function fetchWithRetry(apiCall, maxRetries = 3) {
+        // --- UTILITY FUNCTIONS ---
+
+        // Simple exponential backoff retry mechanism for API calls
+        async function fetchWithRetry(apiCall, maxRetries = 3, delay = 1000) {
             for (let i = 0; i < maxRetries; i++) {
                 try {
                     return await apiCall();
                 } catch (error) {
                     if (i === maxRetries - 1) {
-                        console.error("API call failed after max retries:", error);
+                        console.error("All retries failed for API call:", error);
                         throw error;
                     }
-                    const delay = Math.pow(2, i) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
+                    await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
                 }
             }
         }
 
+        // --- 1. FIREBASE INITIALIZATION & AUTH ---
 
-        // 1. FIREBASE INITIALIZATION AND AUTHENTICATION
-        function initFirebaseAndAuth() {
+        async function initFirebaseAndAuth() {
             if (!firebaseConfig) {
                 console.error("Firebase configuration is missing. Cannot initialize app.");
+                userIdDisplay.textContent = 'ERROR: No Firebase Config.';
                 return;
             }
 
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
-            setLogLevel('Debug'); // Enable debug logging for Firestore
+            setLogLevel('debug'); // Enable detailed Firestore logging
 
+            // Listen for auth state changes to determine userId
             onAuthStateChanged(auth, async (user) => {
-                isAuthReady = true;
-
                 if (user) {
-                    // --- User is Authenticated ---
                     userId = user.uid;
-                    userDisplay.textContent = `Logged in as: ${user.email || 'Guest User (Anon)'}`;
-                    
-                    authView.classList.add('hidden');
-                    workoutView.classList.remove('hidden');
-                    statusHeader.classList.remove('hidden');
-                    if (user.isAnonymous) {
-                         signOutButton.classList.add('hidden');
-                         userDisplay.textContent = `Logged in as: Guest User`;
-                    } else {
-                         signOutButton.classList.remove('hidden');
-                    }
-                    
-                    console.log("User authenticated. UID:", userId);
+                    isAuthReady = true;
+                    userIdDisplay.textContent = userId;
+                    // Start loading data only after the user is authenticated/identified
+                    loadLibrary();
                     loadHistory();
-                    loadLibrary(); // Load the new library list
                 } else {
-                    // --- User is Not Authenticated ---
-                    userId = null;
-                    
-                    // Attempt automatic sign-in first (if running in Canvas)
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken).catch(e => {
-                            console.error("Custom token sign-in failed, showing auth view.", e);
-                            showAuthView();
-                        });
-                    } else {
-                        await signInAnonymously(auth).then(anonUser => {
+                    // Sign in with the provided token or anonymously
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            // Fallback to anonymous sign-in if no token is available
+                            const anonUser = await signInAnonymously(auth);
                             userId = anonUser.user.uid;
-                            userDisplay.textContent = `Logged in as: Guest User`;
-                            authView.classList.add('hidden');
-                            workoutView.classList.remove('hidden');
-                            statusHeader.classList.remove('hidden');
-                            signOutButton.classList.add('hidden');
-                            loadHistory();
-                            loadLibrary(); // Load library for anonymous user too
-                        }).catch(e => {
-                            console.error("Anonymous sign-in failed, showing auth view.", e);
-                            showAuthView();
-                        });
-                    }
-                    
-                    if (!userId) {
-                        showAuthView();
+                        }
+                    } catch (error) {
+                        console.error("Authentication failed:", error);
+                        // Use a fallback random ID for unauthenticated state if sign-in fails
+                        userId = crypto.randomUUID();
+                        isAuthReady = true;
+                        userIdDisplay.textContent = `${userId} (Anonymous/Fallback)`;
+                        // Even with fallback, we still try to load data
+                        loadLibrary();
+                        loadHistory();
                     }
                 }
             });
         }
-        
-        function showAuthView() {
-            document.getElementById('auth-title').textContent = isSigningUp ? 'Sign Up' : 'Sign In';
-            document.getElementById('auth-button').textContent = isSigningUp ? 'Register' : 'Sign In';
-            document.getElementById('toggle-auth-mode').textContent = isSigningUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up';
-            
-            authView.classList.remove('hidden');
-            workoutView.classList.add('hidden');
-            statusHeader.classList.add('hidden');
-        }
 
-        // --- AUTHENTICATION LOGIC ---
-        document.getElementById('toggle-auth-mode').addEventListener('click', () => {
-            isSigningUp = !isSigningUp;
-            document.getElementById('auth-error-message').classList.add('hidden');
-            showAuthView();
-        });
+        // --- 2. EXERCISE LIBRARY MANAGEMENT (CRUD) ---
 
-        document.getElementById('auth-button').addEventListener('click', async () => {
-            const authEmailInput = document.getElementById('auth-email');
-            const authPasswordInput = document.getElementById('auth-password');
-            const authErrorMessage = document.getElementById('auth-error-message');
-            
-            authErrorMessage.classList.add('hidden');
-            const email = authEmailInput.value.trim();
-            const password = authPasswordInput.value.trim();
+        // RENDER LIBRARY
+        function renderLibrary(library) {
+            exerciseLibraryList.innerHTML = '';
+            exerciseSelect.innerHTML = '<option value="" disabled selected>Select or type exercise...</option>';
 
-            if (!email || !password) {
-                authErrorMessage.textContent = 'Please enter both email and password.';
-                authErrorMessage.classList.remove('hidden');
+            if (library.length === 0) {
+                exerciseLibraryList.innerHTML = '<p class="text-sm text-gray-500 p-2">No exercises added yet. Use the input above to add one!</p>';
                 return;
             }
 
-            authButton.disabled = true;
-            authButton.textContent = isSigningUp ? 'Registering...' : 'Signing In...';
-
-            try {
-                if (isSigningUp) {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                }
-            } catch (error) {
-                console.error("Auth Error:", error);
-                let message = error.message;
-
-                if (error.code === 'auth/weak-password') {
-                    message = "Password is too weak. Must be at least 6 characters.";
-                } else if (error.code === 'auth/email-already-in-use') {
-                    message = "This email is already registered. Try signing in.";
-                } else if (error.code === 'auth/invalid-email' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    message = "Invalid email or password.";
-                }
-                
-                authErrorMessage.textContent = message;
-                authErrorMessage.classList.remove('hidden');
-            } finally {
-                authButton.disabled = false;
-                authButton.textContent = isSigningUp ? 'Register' : 'Sign In';
-            }
-        });
-        
-        signOutButton.addEventListener('click', () => signOut(auth));
-
-
-        // 2. DYNAMIC INPUT MANAGEMENT (Supersets)
-        
-        function addSetInput(exerciseId) {
-            const setInputs = document.getElementById(`sets-container-${exerciseId}`);
-            if (!setInputs) return;
-            const setId = crypto.randomUUID();
-
-            const setDiv = document.createElement('div');
-            setDiv.id = `set-${setId}`;
-            setDiv.className = 'flex gap-2 items-center set-input-group';
-            setDiv.innerHTML = `
-                <input type="number" placeholder="Reps" min="1" required
-                       class="set-reps w-1/3 p-2 border border-gray-300 rounded-lg focus:border-blue-500" value="10">
-                <input type="number" placeholder="Weight (kg)" min="0" required
-                       class="set-weight w-1/3 p-2 border border-gray-300 rounded-lg focus:border-blue-500" value="60">
-                <button type="button" class="remove-set-btn w-1/3 text-sm text-red-500 hover:text-red-700 p-2 rounded-lg" data-set-id="${setId}">
-                    Remove Set
-                </button>
-            `;
-            setInputs.appendChild(setDiv);
-
-            setDiv.querySelector('.remove-set-btn').addEventListener('click', () => {
-                setDiv.remove();
-            });
-        }
-
-        // Adds a single exercise block to the log form
-        function addExerciseBlock(exerciseName = '') {
-            const exerciseId = `ex-${crypto.randomUUID()}`;
-
-            const blockDiv = document.createElement('div');
-            blockDiv.id = exerciseId;
-            blockDiv.className = 'p-4 rounded-xl border bg-gray-50 border-gray-200 space-y-3 relative';
-            blockDiv.dataset.isSuperset = false;
-
-            blockDiv.innerHTML = `
-                <div class="flex items-center justify-between mb-2">
-                    <label class="font-semibold text-gray-700">Exercise</label>
-                    <button type="button" class="remove-exercise-btn text-gray-400 hover:text-red-500 transition" data-exercise-id="${exerciseId}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-
-                <input type="text" placeholder="e.g. Bench Press" required value="${exerciseName}"
-                       class="exercise-name w-full p-2 border border-gray-300 rounded-lg">
-
-                <div id="sets-container-${exerciseId}" class="space-y-2">
-                    <!-- Set inputs go here -->
-                </div>
-
-                <button type="button" class="add-set-btn text-sm text-blue-600 hover:text-blue-800 font-medium py-1 px-2 rounded-lg border border-blue-100 bg-blue-50 transition"
-                        data-exercise-id="${exerciseId}">
-                    + Add Set
-                </button>
-            `;
-
-            exercisesContainer.appendChild(blockDiv);
-            addSetInput(exerciseId);
-
-            blockDiv.querySelector('.add-set-btn').addEventListener('click', () => addSetInput(exerciseId));
-            blockDiv.querySelector('.remove-exercise-btn').addEventListener('click', () => {
-                blockDiv.remove();
-                if (exercisesContainer.children.length === 0) {
-                    addExerciseBlock();
-                }
-            });
-            
-            return blockDiv;
-        }
-
-        // Logic for Supersets
-        document.getElementById('add-superset-btn').addEventListener('click', () => {
-            const idA = `ex-${crypto.randomUUID()}`;
-            const idB = `ex-${crypto.randomUUID()}`;
-
-            const groupWrapper = document.createElement('div');
-            groupWrapper.className = 'border-l-4 border-pink-500 pl-4 py-2 space-y-4 bg-pink-50 rounded-lg';
-
-            const createSupersetContent = (exerciseId, label) => {
-                const blockDiv = document.createElement('div');
-                blockDiv.id = exerciseId;
-                blockDiv.className = 'p-4 rounded-xl border border-pink-300 bg-white space-y-3 relative';
-                blockDiv.dataset.isSuperset = true;
-                
-                blockDiv.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="font-bold text-lg text-pink-700">${label}</label>
-                        <button type="button" class="remove-superset-btn text-gray-400 hover:text-red-500 transition" data-group-id="${idA}-${idB}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
-                    </div>
-
-                    <input type="text" placeholder="e.g. Pull-ups / Triceps Pushdown" required
-                        class="exercise-name w-full p-2 border border-pink-300 rounded-lg focus:border-pink-500">
-
-                    <div id="sets-container-${exerciseId}" class="space-y-2">
-                        <!-- Set inputs go here -->
-                    </div>
-
-                    <button type="button" class="add-set-btn text-sm text-pink-600 hover:text-pink-800 font-medium py-1 px-2 rounded-lg border border-pink-200 bg-pink-50 transition"
-                            data-exercise-id="${exerciseId}">
-                        + Add Set
+            // Sort alphabetically for both display and dropdown
+            library.sort((a, b) => a.name.localeCompare(b.name)).forEach(exercise => {
+                // Display list item
+                const item = document.createElement('div');
+                item.className = 'flex justify-between items-center text-gray-700 bg-white p-2 rounded-lg border border-gray-200 text-sm';
+                item.innerHTML = `
+                    <span>${exercise.name}</span>
+                    <button data-name="${exercise.name}" class="delete-library-btn text-red-500 hover:text-red-700 transition duration-150 p-1 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                 `;
-                
-                addSetInput(exerciseId);
-                blockDiv.querySelector('.add-set-btn').addEventListener('click', () => addSetInput(exerciseId));
-                return blockDiv;
-            };
+                exerciseLibraryList.appendChild(item);
 
-            const blockA = createSupersetContent(idA, 'SUPERS&nbsp; A');
-            const blockB = createSupersetContent(idB, 'SUPERS&nbsp; B');
-            
-            groupWrapper.appendChild(blockA);
-            groupWrapper.appendChild(blockB);
-            exercisesContainer.appendChild(groupWrapper);
-            
-            const removeSuperset = () => {
-                groupWrapper.remove();
-                if (exercisesContainer.children.length === 0) addExerciseBlock();
-            };
-
-            blockA.querySelector('.remove-superset-btn').addEventListener('click', removeSuperset);
-            blockB.querySelector('.remove-superset-btn').addEventListener('click', removeSuperset);
-
-            groupWrapper.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        document.getElementById('add-exercise-btn').addEventListener('click', () => {
-            const newBlock = addExerciseBlock();
-            newBlock.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        // Initialize with one exercise block on load
-        addExerciseBlock();
-
-
-        // 3. EXERCISE LIBRARY MANAGEMENT (New Feature)
-        
-        // CRUD: Add Exercise to Library
-        addLibraryBtn.addEventListener('click', async () => {
-            if (!userId) {
-                displayFeedback('You must be signed in to manage your library.', 'error');
-                return;
-            }
-            const name = newExerciseInput.value.trim();
-            if (name === '') {
-                displayFeedback('Please enter an exercise name.', 'error');
-                return;
-            }
-            
-            addLibraryBtn.textContent = 'Adding...';
-            addLibraryBtn.disabled = true;
-
-            try {
-                const docRef = doc(db, `artifacts/${appId}/users/${userId}/exercise_library`, name);
-                await fetchWithRetry(() => setDoc(docRef, { name: name }));
-                newExerciseInput.value = '';
-                displayFeedback(`Exercise "${name}" added to library!`, 'success');
-            } catch (error) {
-                console.error("Error adding library exercise:", error);
-                displayFeedback('Failed to add exercise to library.', 'error');
-            } finally {
-                addLibraryBtn.textContent = 'Add';
-                addLibraryBtn.disabled = false;
-            }
-        });
-
-        // CRUD: Delete Exercise from Library
-        async function deleteLibraryExercise(name) {
-             if (!userId) return;
-
-             try {
-                const docRef = doc(db, `artifacts/${appId}/users/${userId}/exercise_library`, name);
-                await fetchWithRetry(() => deleteDoc(docRef));
-                displayFeedback(`Exercise "${name}" removed from library.`, 'success');
-            } catch (error) {
-                console.error("Error deleting library exercise:", error);
-                displayFeedback('Failed to delete exercise from library.', 'error');
-            }
-        }
-
-        function renderLibrary(exercises) {
-            libraryContainer.innerHTML = '';
-            loadingLibrary.classList.add('hidden');
-
-            if (exercises.length === 0) {
-                libraryContainer.innerHTML = '<p class="text-center text-gray-500 py-2">Your library is empty. Add an exercise above!</p>';
-                return;
-            }
-
-            exercises.sort((a, b) => a.name.localeCompare(b.name)).forEach(ex => {
-                const exerciseItem = document.createElement('div');
-                exerciseItem.className = 'flex justify-between items-center p-3 bg-gray-100 rounded-lg border border-gray-200';
-                
-                const nameSpan = document.createElement('span');
-                nameSpan.textContent = ex.name;
-                nameSpan.className = 'flex-grow font-medium text-gray-700 cursor-pointer hover:text-blue-600 transition';
-                
-                // Quick Add Logic
-                nameSpan.addEventListener('click', () => {
-                    const newBlock = addExerciseBlock(ex.name);
-                    newBlock.scrollIntoView({ behavior: 'smooth' });
-                    displayFeedback(`Added "${ex.name}" to your log.`, 'success');
-                });
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.innerHTML = `<svg class="w-4 h-4 text-red-500 hover:text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>`;
-                deleteBtn.title = `Remove ${ex.name}`;
-                deleteBtn.addEventListener('click', () => deleteLibraryExercise(ex.name));
-
-                exerciseItem.appendChild(nameSpan);
-                exerciseItem.appendChild(deleteBtn);
-                libraryContainer.appendChild(exerciseItem);
+                // Add to dropdown
+                const option = document.createElement('option');
+                option.value = exercise.name;
+                option.textContent = exercise.name;
+                exerciseSelect.appendChild(option);
             });
         }
 
+        // LOAD LIBRARY (Real-time listener)
         function loadLibrary() {
-            if (!db || !userId) return;
-            loadingLibrary.classList.remove('hidden');
-            libraryContainer.innerHTML = '';
-
+            if (!isAuthReady || !db) return;
             const libraryCollection = collection(db, `artifacts/${appId}/users/${userId}/exercise_library`);
             const q = query(libraryCollection);
 
             onSnapshot(q, (snapshot) => {
-                const exercises = [];
+                const library = [];
                 snapshot.forEach(doc => {
-                    exercises.push({ id: doc.id, ...doc.data() });
+                    library.push(doc.data());
                 });
-                renderLibrary(exercises);
+                renderLibrary(library);
             }, (error) => {
-                console.error("Error fetching library: ", error);
-                loadingLibrary.textContent = 'Failed to load library.';
+                console.error("Error loading exercise library:", error);
+                feedbackMessage.textContent = 'Error loading library. Check console for details.';
+                feedbackMessage.classList.remove('hidden');
+                feedbackMessage.classList.add('text-red-600');
             });
         }
 
-        // 4. WORKOUT LOGGING (Unchanged from previous version)
-        logWorkoutBtn.addEventListener('click', async () => {
-            // ... (rest of logWorkoutBtn implementation is the same)
-            if (!isAuthReady || !userId) {
-                displayFeedback('You must be signed in to log a workout.', 'error');
+        // ADD LIBRARY ITEM (Create)
+        document.getElementById('add-library-btn').addEventListener('click', async () => {
+            const name = newLibraryExerciseInput.value.trim();
+            if (!name || !isAuthReady) return;
+
+            try {
+                // Use the exercise name as the document ID to prevent duplicates
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/exercise_library`, name); 
+                
+                await fetchWithRetry(() => setDoc(docRef, { name: name }));
+
+                newLibraryExerciseInput.value = '';
+                feedbackMessage.textContent = `Added "${name}" to library!`;
+                feedbackMessage.classList.remove('text-red-600', 'hidden');
+                feedbackMessage.classList.add('text-green-600');
+                setTimeout(() => feedbackMessage.classList.add('hidden'), 3000);
+
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                feedbackMessage.textContent = `Error adding "${name}": ${e.message}`;
+                feedbackMessage.classList.remove('hidden');
+                feedbackMessage.classList.add('text-red-600');
+            }
+        });
+
+        // DELETE LIBRARY ITEM (Delete)
+        exerciseLibraryList.addEventListener('click', async (e) => {
+            if (e.target.closest('.delete-library-btn') && isAuthReady) {
+                const button = e.target.closest('.delete-library-btn');
+                const name = button.dataset.name;
+
+                try {
+                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/exercise_library`, name);
+                    await fetchWithRetry(() => deleteDoc(docRef));
+
+                    feedbackMessage.textContent = `Removed "${name}" from library.`;
+                    feedbackMessage.classList.remove('text-red-600', 'hidden');
+                    feedbackMessage.classList.add('text-green-600');
+                    setTimeout(() => feedbackMessage.classList.add('hidden'), 3000);
+                } catch (e) {
+                    console.error("Error removing document: ", e);
+                    feedbackMessage.textContent = `Error removing "${name}": ${e.message}`;
+                    feedbackMessage.classList.remove('hidden');
+                    feedbackMessage.classList.add('text-red-600');
+                }
+            }
+        });
+
+        // --- 3. CURRENT WORKOUT SESSION LOGIC ---
+
+        function updateCurrentExerciseDisplay() {
+            setList.innerHTML = '';
+
+            if (currentExerciseName) {
+                currentExerciseNameEl.textContent = currentExerciseName;
+                currentExerciseDetails.classList.remove('hidden');
+                
+                // Render the sets for the current exercise
+                currentExerciseSets.forEach((set, index) => {
+                    const setItem = document.createElement('div');
+                    setItem.className = 'flex justify-between items-center bg-gray-100 p-2 rounded text-sm';
+                    setItem.innerHTML = `
+                        <span>Set ${index + 1}: ${set.sets}x${set.reps} @ ${set.weight}kg/lbs</span>
+                        <button data-index="${index}" class="remove-set-btn text-red-400 hover:text-red-600 p-1 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    `;
+                    setList.appendChild(setItem);
+                });
+            } else {
+                currentExerciseDetails.classList.add('hidden');
+            }
+        }
+
+        function updateWorkoutSummary() {
+            completedExercisesList.innerHTML = '';
+            if (completedExercises.length === 0) {
+                noExercisesMessage.classList.remove('hidden');
+            } else {
+                noExercisesMessage.classList.add('hidden');
+                completedExercises.forEach(exercise => {
+                    const summaryItem = document.createElement('div');
+                    summaryItem.className = 'bg-blue-100 p-3 rounded-lg';
+                    let setsHtml = exercise.sets.map((set, index) => 
+                        `<li class="text-sm">Set ${index + 1}: ${set.sets}x${set.reps} @ ${set.weight}</li>`
+                    ).join('');
+                    summaryItem.innerHTML = `
+                        <h4 class="font-bold text-blue-900">${exercise.name} (${exercise.sets.length} sets)</h4>
+                        <ul class="list-disc list-inside ml-2">${setsHtml}</ul>
+                    `;
+                    completedExercisesList.appendChild(summaryItem);
+                });
+            }
+        }
+        
+        // ADD SET
+        document.getElementById('add-set-btn').addEventListener('click', () => {
+            let exerciseName = exerciseSelect.value || document.getElementById('custom-exercise-input').value.trim();
+            const sets = parseInt(document.getElementById('sets-input').value);
+            const reps = parseInt(document.getElementById('reps-input').value);
+            const weight = parseFloat(document.getElementById('weight-input').value);
+
+            if (!exerciseName || isNaN(sets) || isNaN(reps) || isNaN(weight) || sets <= 0 || reps <= 0) {
+                feedbackMessage.textContent = "Please select an exercise and enter valid Sets, Reps, and Weight.";
+                feedbackMessage.classList.remove('hidden', 'text-green-600');
+                feedbackMessage.classList.add('text-red-600');
                 return;
             }
 
-            const exercises = [];
-            let isValid = true;
-            
-            exercisesContainer.querySelectorAll('[data-is-superset]').forEach(exerciseDiv => {
-                const nameInput = exerciseDiv.querySelector('.exercise-name');
-                const setsContainer = exerciseDiv.querySelector('[id^="sets-container-"]');
+            // If starting a new exercise, reset the sets list
+            if (currentExerciseName !== exerciseName) {
+                currentExerciseName = exerciseName;
+                currentExerciseSets = [];
+            }
 
-                if (!nameInput || !nameInput.value.trim()) {
-                    isValid = false;
-                    nameInput.classList.add('border-red-500');
-                    return;
-                }
-                nameInput.classList.remove('border-red-500');
+            currentExerciseSets.push({ sets, reps, weight });
 
-                const exercise = {
-                    name: nameInput.value.trim(),
-                    isSuperset: exerciseDiv.dataset.isSuperset === 'true',
-                    sets: []
-                };
+            // Clear inputs for the next set
+            document.getElementById('sets-input').value = 1;
+            document.getElementById('reps-input').value = '';
+            document.getElementById('weight-input').value = '';
 
-                setsContainer.querySelectorAll('.set-input-group').forEach(setDiv => {
-                    const repsInput = setDiv.querySelector('.set-reps');
-                    const weightInput = setDiv.querySelector('.set-weight');
+            updateCurrentExerciseDisplay();
+        });
 
-                    const reps = parseInt(repsInput.value);
-                    const weight = parseFloat(weightInput.value);
+        // REMOVE SET
+        setList.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-set-btn')) {
+                const index = parseInt(e.target.closest('.remove-set-btn').dataset.index);
+                currentExerciseSets.splice(index, 1);
+                updateCurrentExerciseDisplay();
+            }
+        });
 
-                    if (isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
-                        isValid = false;
-                        repsInput.classList.add('border-red-500');
-                        weightInput.classList.add('border-red-500');
-                        return;
-                    }
-
-                    repsInput.classList.remove('border-red-500');
-                    weightInput.classList.remove('border-red-500');
-
-                    exercise.sets.push({ reps, weight });
+        // FINISH EXERCISE
+        document.getElementById('finish-exercise-btn').addEventListener('click', () => {
+            if (currentExerciseName && currentExerciseSets.length > 0) {
+                completedExercises.push({
+                    name: currentExerciseName,
+                    sets: currentExerciseSets
                 });
 
-                if (exercise.sets.length > 0) {
-                    exercises.push(exercise);
-                }
-            });
+                // Reset current exercise state
+                currentExerciseName = null;
+                currentExerciseSets = [];
+                
+                updateCurrentExerciseDisplay();
+                updateWorkoutSummary();
+                
+                // Reset form fields
+                document.getElementById('custom-exercise-input').value = '';
+                exerciseSelect.value = '';
+                document.getElementById('sets-input').value = 1;
+                document.getElementById('reps-input').value = '';
+                document.getElementById('weight-input').value = '';
+                
+            } else {
+                feedbackMessage.textContent = "Cannot finish. Add at least one set to the current exercise.";
+                feedbackMessage.classList.remove('hidden', 'text-green-600');
+                feedbackMessage.classList.add('text-red-600');
+                setTimeout(() => feedbackMessage.classList.add('hidden'), 3000);
+            }
+        });
 
-            if (!isValid || exercises.length === 0) {
-                displayFeedback('Please fill out all required fields with valid data.', 'error');
+        // LOG WORKOUT (Create)
+        document.getElementById('log-workout-btn').addEventListener('click', async () => {
+            if (completedExercises.length === 0 || !isAuthReady) {
+                feedbackMessage.textContent = "Please add exercises to your workout before logging.";
+                feedbackMessage.classList.remove('hidden', 'text-green-600');
+                feedbackMessage.classList.add('text-red-600');
+                setTimeout(() => feedbackMessage.classList.add('hidden'), 3000);
                 return;
             }
 
+            const logWorkoutBtn = document.getElementById('log-workout-btn');
             logWorkoutBtn.textContent = 'Logging...';
             logWorkoutBtn.disabled = true;
+
+            const exercises = completedExercises;
 
             try {
                 const workoutId = crypto.randomUUID();
@@ -602,95 +498,124 @@
                     id: workoutId
                 }));
 
-                displayFeedback('Workout logged successfully!', 'success');
+                // Reset session state after successful log
+                completedExercises = [];
+                updateWorkoutSummary();
+                
+                feedbackMessage.textContent = 'Workout successfully logged!';
+                feedbackMessage.classList.remove('text-red-600', 'hidden');
+                feedbackMessage.classList.add('text-green-600');
 
-                // Clear the form
-                exercisesContainer.innerHTML = '';
-                addExerciseBlock();
-
-            } catch (error) {
-                console.error("Error logging workout: ", error);
-                displayFeedback('Failed to log workout. Please check your console.', 'error');
+            } catch (e) {
+                console.error("Error logging workout: ", e);
+                feedbackMessage.textContent = `Error logging workout: ${e.message}`;
+                feedbackMessage.classList.remove('text-green-600', 'hidden');
+                feedbackMessage.classList.add('text-red-600');
             } finally {
                 logWorkoutBtn.textContent = 'Log Workout';
                 logWorkoutBtn.disabled = false;
+                setTimeout(() => {
+                    feedbackMessage.classList.add('hidden');
+                    feedbackMessage.classList.remove('text-red-600');
+                    feedbackMessage.classList.add('text-green-600');
+                }, 5000);
             }
         });
 
-        function displayFeedback(message, type) {
-            feedbackMessage.textContent = message;
-            feedbackMessage.classList.remove('hidden', 'text-white', 'bg-green-500', 'bg-red-500');
-            if (type === 'success') {
-                feedbackMessage.classList.add('text-white', 'bg-green-500');
-            } else {
-                feedbackMessage.classList.add('text-white', 'bg-red-500');
-            }
-            setTimeout(() => {
-                feedbackMessage.classList.add('hidden');
-            }, 5000);
-        }
+        // --- 4. HISTORY DISPLAY (Read & Delete) ---
 
-
-        // 5. HISTORY DISPLAY (Unchanged from previous version)
         function renderHistory(workouts) {
-            historyContainer.innerHTML = '';
-            loadingHistory.classList.add('hidden');
+            const workoutHistoryList = document.getElementById('workout-history-list');
+            workoutHistoryList.innerHTML = '';
 
             if (workouts.length === 0) {
-                historyContainer.innerHTML = '<p class="text-center text-gray-500 py-4">No workouts logged yet. Start logging above!</p>';
+                workoutHistoryList.innerHTML = '<p class="text-center text-gray-500 p-4">No workout history logged yet.</p>';
                 return;
             }
 
-            workouts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0)).forEach(workout => {
-                const date = workout.timestamp ? new Date(workout.timestamp.seconds * 1000).toLocaleString() : workout.date || 'Unknown Date';
+            // Sort by timestamp (newest first)
+            workouts.sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds).forEach(workout => {
+                const workoutItem = document.createElement('div');
+                workoutItem.className = 'bg-gray-100 p-4 rounded-xl border border-gray-200';
 
-                const workoutDiv = document.createElement('div');
-                workoutDiv.className = 'p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm';
-                workoutDiv.innerHTML = `
-                    <div class="flex justify-between items-center mb-2 border-b pb-2">
-                        <h3 class="text-xl font-bold text-gray-800">${date}</h3>
+                let exercisesHtml = workout.exercises.map(exercise => {
+                    let setsHtml = exercise.sets.map((set, index) => 
+                        `<li class="text-xs text-gray-600">Set ${index + 1}: ${set.sets}x${set.reps} @ ${set.weight}</li>`
+                    ).join('');
+
+                    return `
+                        <div class="mt-2">
+                            <h4 class="font-semibold text-gray-800">${exercise.name} (${exercise.sets.length} sets)</h4>
+                            <ul class="list-none space-y-0.5 ml-1">${setsHtml}</ul>
+                        </div>
+                    `;
+                }).join('');
+
+                workoutItem.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-bold text-gray-700">${workout.date}</h3>
+                        <button data-id="${workout.id}" class="delete-workout-btn text-red-500 hover:text-red-700 transition duration-150 p-1 rounded-full" title="Delete Workout">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
                     </div>
-                    <div class="space-y-3">
-                        ${workout.exercises.map(ex => `
-                            <div class="p-3 rounded-md ${ex.isSuperset ? 'bg-pink-100 border border-pink-300' : 'bg-white border border-gray-100'}">
-                                <p class="font-semibold ${ex.isSuperset ? 'text-pink-700' : 'text-gray-700'}">${ex.isSuperset ? '⚡ SUPERS&nbsp; ' : ''}${ex.name}</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600 ml-2 mt-1">
-                                    ${ex.sets.map((set, index) => `
-                                        <li>Set ${index + 1}: ${set.reps} reps @ ${set.weight} kg</li>
-                                    `).join('')}
-                                </ul>
-                            </div>
-                        `).join('')}
-                    </div>
+                    <div class="border-t border-gray-300 pt-2">${exercisesHtml}</div>
                 `;
-                historyContainer.appendChild(workoutDiv);
+                workoutHistoryList.appendChild(workoutItem);
             });
+            document.getElementById('loading-history').classList.add('hidden');
         }
 
+        // LOAD HISTORY (Real-time listener)
         function loadHistory() {
-            if (!db || !userId) return;
-            loadingHistory.classList.remove('hidden');
-
+            if (!isAuthReady || !db) return;
             const workoutsCollection = collection(db, `artifacts/${appId}/users/${userId}/workouts`);
             const q = query(workoutsCollection);
 
             onSnapshot(q, (snapshot) => {
                 const workouts = [];
                 snapshot.forEach(doc => {
-                    workouts.push({ id: doc.id, ...doc.data() });
+                    workouts.push(doc.data());
                 });
-                workouts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 renderHistory(workouts);
             }, (error) => {
-                console.error("Error fetching history: ", error);
-                loadingHistory.textContent = 'Failed to load history.';
+                console.error("Error loading workout history:", error);
+                document.getElementById('loading-history').textContent = 'Error loading history.';
             });
         }
 
+        // DELETE WORKOUT (Delete)
+        document.getElementById('workout-history-list').addEventListener('click', async (e) => {
+            if (e.target.closest('.delete-workout-btn') && isAuthReady) {
+                const button = e.target.closest('.delete-workout-btn');
+                const workoutId = button.dataset.id;
+                
+                // Simple confirmation logic (replace with modal UI in production)
+                // Since alerts are forbidden, we rely on the user understanding the button click
+                
+                try {
+                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/workouts`, workoutId);
+                    await fetchWithRetry(() => deleteDoc(docRef));
+
+                    feedbackMessage.textContent = 'Workout log deleted.';
+                    feedbackMessage.classList.remove('text-red-600', 'hidden');
+                    feedbackMessage.classList.add('text-green-600');
+                    setTimeout(() => feedbackMessage.classList.add('hidden'), 3000);
+                } catch (e) {
+                    console.error("Error deleting workout: ", e);
+                    feedbackMessage.textContent = `Error deleting workout: ${e.message}`;
+                    feedbackMessage.classList.remove('hidden');
+                    feedbackMessage.classList.add('text-red-600');
+                }
+            }
+        });
+
         // Initialize on window load
-        window.onload = initFirebaseAndAuth;
+        window.onload = function () {
+            initFirebaseAndAuth();
+        }
 
     </script>
-
 </body>
 </html>
