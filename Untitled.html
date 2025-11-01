@@ -15,8 +15,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-<!-- Font Awesome for Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-somehash" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
 
 <style>
 body { font-family: 'Segoe UI', sans-serif; margin:0; padding:0; background:#f0f4f8; color:#333; }
@@ -67,10 +67,7 @@ const db = firebase.firestore();
 
 function App() {
   const [user,setUser] = useState(null);
-  useEffect(()=>{
-    const unsubscribe = auth.onAuthStateChanged(u=>setUser(u));
-    return ()=>unsubscribe();
-  },[]);
+  useEffect(()=>{ const unsubscribe = auth.onAuthStateChanged(u=>setUser(u)); return ()=>unsubscribe(); },[]);
   if(!user) return <Login />;
   return <Dashboard user={user} />;
 }
@@ -116,58 +113,22 @@ function Dashboard({user}){
   const [weightInput,setWeightInput] = useState('');
   const [supersetInput,setSupersetInput] = useState(false);
 
-  const loadExercises = async ()=>{
-    const snapshot = await db.collection('exercises').where('uid','==',user.uid).get();
-    setExercises(snapshot.docs.map(d=>({id:d.id,name:d.data().name})));
-  }
+  const loadExercises = async ()=>{ const snapshot = await db.collection('exercises').where('uid','==',user.uid).get(); setExercises(snapshot.docs.map(d=>({id:d.id,name:d.data().name}))); }
+  const loadWorkouts = async ()=>{ const snapshot = await db.collection('workouts').where('uid','==',user.uid).orderBy('date','desc').get(); setWorkouts(snapshot.docs.map(d=>({id:d.id,...d.data()}))); }
 
-  const loadWorkouts = async ()=>{
-    const snapshot = await db.collection('workouts').where('uid','==',user.uid).orderBy('date','desc').get();
-    setWorkouts(snapshot.docs.map(d=>({id:d.id,...d.data()})));
-  }
-
-  useEffect(()=>{
-    loadExercises();
-    loadWorkouts();
-  },[]);
+  useEffect(()=>{ loadExercises(); loadWorkouts(); },[]);
 
   const totalWorkouts = workouts.length;
-  const totalSets = workouts.reduce((acc,w)=>acc+w.sets.length,0);
+  const totalSets = workouts.reduce((acc,w)=>acc+w.sets?.length||0,0);
   const heaviestLifts = {};
-  workouts.forEach(w=>{
-    w.sets.forEach(s=>{
-      if(!heaviestLifts[s.exercise] || s.weight>heaviestLifts[s.exercise]) heaviestLifts[s.exercise]=s.weight;
-    })
-  });
+  workouts.forEach(w=>{ w.sets?.forEach(s=>{ if(!heaviestLifts[s.exercise] || s.weight>heaviestLifts[s.exercise]) heaviestLifts[s.exercise]=s.weight; }) });
   const recentWorkouts = workouts.slice(0,5);
   const maxWeight = Math.max(...Object.values(heaviestLifts),1);
 
-  const handleAddExercise = async ()=>{
-    if(!newExercise) return;
-    await db.collection('exercises').add({name:newExercise,uid:user.uid});
-    setNewExercise('');
-    await loadExercises();
-  }
-
-  const handleDeleteExercise = async id=>{
-    await db.collection('exercises').doc(id).delete();
-    await loadExercises();
-  }
-
-  const handleAddSet = ()=>{
-    if(!exerciseInput || !repsInput || !weightInput) return;
-    setSets([...sets,{exercise:exerciseInput,reps:repsInput,weight:weightInput,superset:supersetInput}]);
-    setExerciseInput(''); setRepsInput(''); setWeightInput(''); setSupersetInput(false);
-  }
-
-  const handleSaveWorkout = async ()=>{
-    if(!selectedWorkout || sets.length===0) return;
-    const date = new Date().toISOString();
-    await db.collection('workouts').add({uid:user.uid,name:selectedWorkout,sets,date});
-    setSelectedWorkout(''); setSets([]);
-    await loadWorkouts();
-  }
-
+  const handleAddExercise = async ()=>{ if(!newExercise) return; await db.collection('exercises').add({name:newExercise,uid:user.uid}); setNewExercise(''); await loadExercises(); }
+  const handleDeleteExercise = async id=>{ await db.collection('exercises').doc(id).delete(); await loadExercises(); }
+  const handleAddSet = ()=>{ if(!exerciseInput || !repsInput || !weightInput) return; setSets([...sets,{exercise:exerciseInput,reps:repsInput,weight:weightInput,superset:supersetInput}]); setExerciseInput(''); setRepsInput(''); setWeightInput(''); setSupersetInput(false);}
+  const handleSaveWorkout = async ()=>{ if(!selectedWorkout || sets.length===0) return; const date=new Date().toISOString(); await db.collection('workouts').add({uid:user.uid,name:selectedWorkout,sets,date}); setSelectedWorkout(''); setSets([]); await loadWorkouts(); }
   const handleLogout = async ()=>{ await auth.signOut(); }
 
   return (
@@ -177,27 +138,21 @@ function Dashboard({user}){
         <button className="logout-btn" onClick={handleLogout}><i className="fas fa-sign-out-alt"></i> Logout</button>
       </header>
 
-      {/* Stats Dashboard */}
+      {/* Stats */}
       <div className="container card">
         <h2><i className="fas fa-chart-line"></i> Stats</h2>
         <p><strong>Total Workouts:</strong> {totalWorkouts}</p>
         <p><strong>Total Sets:</strong> {totalSets}</p>
         <h4>Heaviest Lifts:</h4>
         {Object.keys(heaviestLifts).length===0 && <p>No lifts yet.</p>}
-        {Object.keys(heaviestLifts).map(ex=>{
-          const widthPercent = Math.round((heaviestLifts[ex]/maxWeight)*100);
-          return (
-            <div key={ex} style={{marginBottom:'10px'}}>
-              <div style={{display:'flex', justifyContent:'space-between'}}>
-                <span>{ex}: {heaviestLifts[ex]} kg</span>
-                <span>{widthPercent}%</span>
-              </div>
-              <div className="progress-bar-bg">
-                <div className="progress-bar-fill" style={{width:`${widthPercent}%`}}></div>
-              </div>
+        {Object.keys(heaviestLifts).map(ex=>{ const widthPercent=Math.round((heaviestLifts[ex]/maxWeight)*100); return (
+          <div key={ex} style={{marginBottom:'10px'}}>
+            <div style={{display:'flex', justifyContent:'space-between'}}>
+              <span>{ex}: {heaviestLifts[ex]} kg</span><span>{widthPercent}%</span>
             </div>
-          )
-        })}
+            <div className="progress-bar-bg"><div className="progress-bar-fill" style={{width:`${widthPercent}%`}}></div></div>
+          </div>
+        )})}
         <h4>Recent Workouts:</h4>
         {recentWorkouts.length===0 && <p>No recent workouts.</p>}
         <ul>{recentWorkouts.map(w=><li key={w.id||w.date}><i className="fas fa-calendar-alt"></i> {w.name} - {new Date(w.date).toLocaleDateString()}</li>)}</ul>
@@ -206,12 +161,7 @@ function Dashboard({user}){
       {/* Exercises */}
       <div className="container card">
         <h2><i className="fas fa-dumbbell"></i> Exercises</h2>
-        {exercises.map(e=>
-          <div key={e.id} className="flex">
-            <span>{e.name}</span>
-            <button className="delete-btn" onClick={()=>handleDeleteExercise(e.id)}><i className="fas fa-trash"></i> Delete</button>
-          </div>
-        )}
+        {exercises.map(e=><div key={e.id} className="flex"><span>{e.name}</span><button className="delete-btn" onClick={()=>handleDeleteExercise(e.id)}><i className="fas fa-trash"></i> Delete</button></div>)}
         <div className="flex">
           <input placeholder="New Exercise" value={newExercise} onChange={e=>setNewExercise(e.target.value)}/>
           <button className="add-btn" onClick={handleAddExercise}><i className="fas fa-plus"></i> Add</button>
@@ -224,18 +174,15 @@ function Dashboard({user}){
         <input placeholder="Workout Name (Push/Pull/Legs)" value={selectedWorkout} onChange={e=>setSelectedWorkout(e.target.value)}/>
         <div className="flex">
           <select value={exerciseInput} onChange={e=>setExerciseInput(e.target.value)}>
-            <option value="">Select Exercise</option>
-            {exercises.map(e=><option key={e.id} value={e.name}>{e.name}</option>)}
+            <option value="">Select Exercise</option>{exercises.map(e=><option key={e.id} value={e.name}>{e.name}</option>)}
           </select>
           <input type="number" placeholder="Reps" value={repsInput} onChange={e=>setRepsInput(e.target.value)}/>
           <input type="number" placeholder="Weight (kg)" value={weightInput} onChange={e=>setWeightInput(e.target.value)}/>
           <label><input type="checkbox" checked={supersetInput} onChange={e=>setSupersetInput(e.target.checked)}/> Superset</label>
           <button className="add-btn" onClick={handleAddSet}><i className="fas fa-plus"></i> Add Set</button>
         </div>
-        {sets.length>0 && <table>
-          <thead><tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr></thead>
-          <tbody>{sets.map((s,i)=><tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>)}</tbody>
-        </table>}
+        {sets.length>0 && <table><thead><tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr></thead>
+        <tbody>{sets.map((s,i)=><tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>)}</tbody></table>}
         <button className="add-btn" onClick={handleSaveWorkout}><i className="fas fa-save"></i> Save Workout</button>
       </div>
 
@@ -243,15 +190,13 @@ function Dashboard({user}){
       <div className="container card">
         <h2><i className="fas fa-history"></i> Workout History</h2>
         {workouts.length===0 && <p>No workouts logged yet.</p>}
-        {workouts.map(w=>
-          <div key={w.id||w.date} className="card">
-            <strong>{w.name}</strong> - {new Date(w.date).toLocaleString()}
-            <table>
-              <thead><tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr></thead>
-              <tbody>{w.sets.map((s,i)=><tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>)}</tbody>
-            </table>
-          </div>
-        )}
+        {workouts.map(w=><div key={w.id||w.date} className="card">
+          <strong>{w.name}</strong> - {new Date(w.date).toLocaleString()}
+          <table>
+            <thead><tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr></thead>
+            <tbody>{Array.isArray(w.sets) && w.sets.map((s,i)=><tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>)}</tbody>
+          </table>
+        </div>)}
       </div>
     </div>
   )
