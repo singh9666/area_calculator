@@ -37,6 +37,11 @@
             color: var(--text);
             line-height: 1.6;
             padding-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        body.menu-open {
+            overflow: hidden;
         }
         
         .container {
@@ -81,18 +86,20 @@
             color: white;
             font-size: 1.5rem;
             cursor: pointer;
+            z-index: 101;
         }
         
-        nav ul {
+        /* Desktop Navigation */
+        .desktop-nav ul {
             display: flex;
             list-style: none;
         }
         
-        nav ul li {
+        .desktop-nav ul li {
             margin-left: 16px;
         }
         
-        nav ul li a {
+        .desktop-nav ul li a {
             color: white;
             text-decoration: none;
             font-weight: 500;
@@ -102,7 +109,7 @@
             display: block;
         }
         
-        nav ul li a:hover, nav ul li a.active {
+        .desktop-nav ul li a:hover, .desktop-nav ul li a.active {
             background: rgba(255,255,255,0.2);
         }
         
@@ -112,35 +119,100 @@
                 display: block;
             }
             
-            nav {
+            .desktop-nav {
+                display: none;
+            }
+            
+            .mobile-nav {
                 position: fixed;
-                top: 70px;
+                top: 0;
                 right: -100%;
-                width: 70%;
-                height: calc(100vh - 70px);
+                width: 80%;
+                height: 100vh;
                 background: var(--primary);
                 transition: right 0.3s ease;
                 box-shadow: -2px 0 10px rgba(0,0,0,0.1);
                 z-index: 99;
+                overflow-y: auto;
             }
             
-            nav.active {
+            .mobile-nav.active {
                 right: 0;
             }
             
-            nav ul {
-                flex-direction: column;
-                padding: 20px;
+            .nav-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem 1.5rem;
+                border-bottom: 1px solid rgba(255,255,255,0.2);
             }
             
-            nav ul li {
+            .nav-title {
+                color: white;
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+            
+            .close-menu {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .mobile-nav ul {
+                flex-direction: column;
+                padding: 1rem 1.5rem;
+                list-style: none;
+            }
+            
+            .mobile-nav ul li {
                 margin: 0 0 15px 0;
             }
             
-            nav ul li a {
+            .mobile-nav ul li a {
                 padding: 12px 16px;
                 border-radius: 8px;
                 font-size: 1.1rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: white;
+                text-decoration: none;
+                transition: background 0.3s;
+            }
+            
+            .mobile-nav ul li a:hover, .mobile-nav ul li a.active {
+                background: rgba(255,255,255,0.2);
+            }
+            
+            .mobile-nav ul li a i {
+                width: 20px;
+                text-align: center;
+            }
+            
+            /* Overlay when menu is open */
+            .nav-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 98;
+                display: none;
+            }
+            
+            .nav-overlay.active {
+                display: block;
             }
         }
         
@@ -527,7 +599,7 @@
         }
         
         /* Mobile Bottom Navigation */
-        .mobile-nav {
+        .mobile-bottom-nav {
             display: none;
             position: fixed;
             bottom: 0;
@@ -539,18 +611,18 @@
             padding: 10px 0;
         }
         
-        .mobile-nav-items {
+        .mobile-bottom-nav-items {
             display: flex;
             justify-content: space-around;
             list-style: none;
         }
         
-        .mobile-nav-item {
+        .mobile-bottom-nav-item {
             text-align: center;
             flex: 1;
         }
         
-        .mobile-nav-item a {
+        .mobile-bottom-nav-item a {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -561,11 +633,11 @@
             transition: color 0.3s;
         }
         
-        .mobile-nav-item a.active {
+        .mobile-bottom-nav-item a.active {
             color: var(--primary);
         }
         
-        .mobile-nav-item i {
+        .mobile-bottom-nav-item i {
             font-size: 1.2rem;
             margin-bottom: 4px;
         }
@@ -637,7 +709,7 @@
                 padding: 1rem;
             }
             
-            .mobile-nav {
+            .mobile-bottom-nav {
                 display: block;
             }
             
@@ -695,7 +767,9 @@
                 <button class="menu-toggle" id="menu-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <nav id="main-nav">
+                
+                <!-- Desktop Navigation -->
+                <nav class="desktop-nav">
                     <ul>
                         <li><a href="#" id="nav-dashboard" class="active">Dashboard</a></li>
                         <li><a href="#" id="nav-exercises">Exercises</a></li>
@@ -705,31 +779,60 @@
                 </nav>
             </div>
         </div>
+        
+        <!-- Mobile Navigation -->
+        <div class="nav-overlay" id="nav-overlay"></div>
+        <nav class="mobile-nav" id="mobile-nav">
+            <div class="nav-header">
+                <div class="nav-title">Menu</div>
+                <button class="close-menu" id="close-menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul>
+                <li><a href="#" id="mobile-nav-dashboard" class="active">
+                    <i class="fas fa-chart-bar"></i>
+                    Dashboard
+                </a></li>
+                <li><a href="#" id="mobile-nav-exercises">
+                    <i class="fas fa-running"></i>
+                    Exercises
+                </a></li>
+                <li><a href="#" id="mobile-nav-log-workout">
+                    <i class="fas fa-plus-circle"></i>
+                    Log Workout
+                </a></li>
+                <li><a href="#" id="mobile-nav-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a></li>
+            </ul>
+        </nav>
     </header>
 
     <!-- Mobile Bottom Navigation -->
-    <nav class="mobile-nav">
-        <ul class="mobile-nav-items">
-            <li class="mobile-nav-item">
-                <a href="#" id="mobile-nav-dashboard" class="active">
+    <nav class="mobile-bottom-nav">
+        <ul class="mobile-bottom-nav-items">
+            <li class="mobile-bottom-nav-item">
+                <a href="#" id="bottom-nav-dashboard" class="active">
                     <i class="fas fa-chart-bar"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
-            <li class="mobile-nav-item">
-                <a href="#" id="mobile-nav-exercises">
+            <li class="mobile-bottom-nav-item">
+                <a href="#" id="bottom-nav-exercises">
                     <i class="fas fa-running"></i>
                     <span>Exercises</span>
                 </a>
             </li>
-            <li class="mobile-nav-item">
-                <a href="#" id="mobile-nav-log-workout">
+            <li class="mobile-bottom-nav-item">
+                <a href="#" id="bottom-nav-log-workout">
                     <i class="fas fa-plus-circle"></i>
                     <span>Log Workout</span>
                 </a>
             </li>
-            <li class="mobile-nav-item">
-                <a href="#" id="mobile-nav-logout">
+            <li class="mobile-bottom-nav-item">
+                <a href="#" id="bottom-nav-logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
@@ -903,9 +1006,17 @@
         const mobileNavLogWorkout = document.getElementById('mobile-nav-log-workout');
         const mobileNavLogout = document.getElementById('mobile-nav-logout');
         
+        // Bottom navigation elements
+        const bottomNavDashboard = document.getElementById('bottom-nav-dashboard');
+        const bottomNavExercises = document.getElementById('bottom-nav-exercises');
+        const bottomNavLogWorkout = document.getElementById('bottom-nav-log-workout');
+        const bottomNavLogout = document.getElementById('bottom-nav-logout');
+        
         // Menu toggle
         const menuToggle = document.getElementById('menu-toggle');
-        const mainNav = document.getElementById('main-nav');
+        const mobileNav = document.getElementById('mobile-nav');
+        const closeMenu = document.getElementById('close-menu');
+        const navOverlay = document.getElementById('nav-overlay');
         
         const addExerciseBtn = document.getElementById('add-exercise-btn');
         const exerciseList = document.getElementById('exercise-list');
@@ -919,15 +1030,33 @@
         const lastWorkoutEl = document.getElementById('last-workout');
         const currentStreakEl = document.getElementById('current-streak');
 
+        // Mobile menu functionality
+        function openMobileMenu() {
+            mobileNav.classList.add('active');
+            navOverlay.classList.add('active');
+            document.body.classList.add('menu-open');
+        }
+
+        function closeMobileMenu() {
+            mobileNav.classList.remove('active');
+            navOverlay.classList.remove('active');
+            document.body.classList.remove('menu-open');
+        }
+
         // Update active nav item
         function updateActiveNav(section) {
             // Update desktop nav
-            document.querySelectorAll('nav ul li a').forEach(link => {
+            document.querySelectorAll('.desktop-nav ul li a').forEach(link => {
                 link.classList.remove('active');
             });
             
             // Update mobile nav
-            document.querySelectorAll('.mobile-nav-item a').forEach(link => {
+            document.querySelectorAll('.mobile-nav ul li a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Update bottom nav
+            document.querySelectorAll('.mobile-bottom-nav-item a').forEach(link => {
                 link.classList.remove('active');
             });
             
@@ -935,24 +1064,15 @@
             if (section === 'dashboard') {
                 navDashboard.classList.add('active');
                 mobileNavDashboard.classList.add('active');
+                bottomNavDashboard.classList.add('active');
             } else if (section === 'exercises') {
                 navExercises.classList.add('active');
                 mobileNavExercises.classList.add('active');
+                bottomNavExercises.classList.add('active');
             } else if (section === 'workout') {
                 navLogWorkout.classList.add('active');
                 mobileNavLogWorkout.classList.add('active');
-            }
-        }
-
-        // Toggle mobile menu
-        function toggleMobileMenu() {
-            mainNav.classList.toggle('active');
-        }
-
-        // Close mobile menu when clicking outside
-        function closeMobileMenu(e) {
-            if (!mainNav.contains(e.target) && !menuToggle.contains(e.target)) {
-                mainNav.classList.remove('active');
+                bottomNavLogWorkout.classList.add('active');
             }
         }
 
@@ -1152,8 +1272,7 @@
             exerciseSection.classList.add('hidden');
             workoutSection.classList.add('hidden');
             updateActiveNav('dashboard');
-            // Close mobile menu if open
-            mainNav.classList.remove('active');
+            closeMobileMenu();
         }
 
         function showExercises() {
@@ -1162,8 +1281,7 @@
             workoutSection.classList.add('hidden');
             updateActiveNav('exercises');
             renderExercises();
-            // Close mobile menu if open
-            mainNav.classList.remove('active');
+            closeMobileMenu();
         }
 
         function showWorkoutLogging() {
@@ -1172,8 +1290,7 @@
             workoutSection.classList.remove('hidden');
             updateActiveNav('workout');
             initializeWorkoutForm();
-            // Close mobile menu if open
-            mainNav.classList.remove('active');
+            closeMobileMenu();
         }
 
         // Dashboard functions
@@ -1591,9 +1708,16 @@
             mobileNavLogWorkout.addEventListener('click', showWorkoutLogging);
             mobileNavLogout.addEventListener('click', logout);
             
-            // Menu toggle
-            menuToggle.addEventListener('click', toggleMobileMenu);
-            document.addEventListener('click', closeMobileMenu);
+            // Bottom navigation event listeners
+            bottomNavDashboard.addEventListener('click', showDashboard);
+            bottomNavExercises.addEventListener('click', showExercises);
+            bottomNavLogWorkout.addEventListener('click', showWorkoutLogging);
+            bottomNavLogout.addEventListener('click', logout);
+            
+            // Menu toggle events
+            menuToggle.addEventListener('click', openMobileMenu);
+            closeMenu.addEventListener('click', closeMobileMenu);
+            navOverlay.addEventListener('click', closeMobileMenu);
             
             // Exercise management event listeners
             addExerciseBtn.addEventListener('click', addNewExercise);
