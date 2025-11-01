@@ -137,13 +137,50 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // IMPORTANT: Global variables provided by the canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        // initialAuthToken is no longer used for permanent login
+        // --- USER CONFIGURATION START ---
+        // Your Firebase configuration provided by the user is now inserted here.
+        // This configuration will be used if the secure Canvas configuration is not available.
+        const CUSTOM_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
+            authDomain: "gymlog-3ef3b.firebaseapp.com",
+            projectId: "gymlog-3ef3b",
+            storageBucket: "gymlog-3ef3b.firebasestorage.app",
+            messagingSenderId: "139587565969",
+            appId: "1:139587565969:web:90bf938d213afbc81e0230",
+            measurementId: "G-5DZYYM4YN2"
+        }; 
+        
+        // This App ID matches your projectId and will be used for Firestore pathing.
+        const CUSTOM_APP_ID = "gymlog-3ef3b";
+        // --- USER CONFIGURATION END ---
 
+
+        // Global variables provided by the canvas environment 
+        const canvasAppId = typeof __app_id !== 'undefined' ? __app_id : null;
+        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        
         let db, auth, userId;
-        const app = firebaseConfig ? initializeApp(firebaseConfig) : null;
+
+        // Determine which configuration to use (Canvas first, then Custom)
+        let finalFirebaseConfig, finalAppId;
+
+        if (canvasFirebaseConfig) {
+            // Priority 1: Use secure Canvas configuration
+            finalFirebaseConfig = canvasFirebaseConfig;
+            finalAppId = canvasAppId;
+        } else if (Object.keys(CUSTOM_FIREBASE_CONFIG).length > 0 && CUSTOM_FIREBASE_CONFIG.apiKey) {
+            // Priority 2: Use manually provided custom configuration if it is non-empty and has an API key
+            finalFirebaseConfig = CUSTOM_FIREBASE_CONFIG;
+            finalAppId = CUSTOM_APP_ID;
+        } else {
+            // Priority 3: No configuration available
+            finalFirebaseConfig = null;
+            finalAppId = null;
+        }
+
+
+        const app = finalFirebaseConfig ? initializeApp(finalFirebaseConfig) : null;
+
         if (app) {
             db = getFirestore(app);
             auth = getAuth(app);
@@ -225,7 +262,7 @@
         });
 
 
-        // --- Core Functions: Set Management (No changes needed, kept for completeness) ---
+        // --- Core Functions: Set Management ---
 
         /**
          * Creates and returns a new HTML element for a set row.
@@ -318,16 +355,18 @@
             }
         }
         
-        // --- Core Functions: Data & Saving (No changes needed, kept for completeness) ---
+        // --- Core Functions: Data & Saving ---
 
         async function saveWorkout(workoutData) {
-            if (!db || !userId) {
-                console.error("Database or User ID is not ready. Cannot save data.");
+            // finalAppId is guaranteed to be available here if 'auth' is initialized.
+            if (!db || !userId || !finalAppId) {
+                console.error("Database, User ID, or App ID is not ready. Cannot save data.");
                 return;
             }
             
             try {
-                const workoutsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'workouts');
+                // Use finalAppId to ensure data is stored in the correct path under your project ID
+                const workoutsCollectionRef = collection(db, 'artifacts', finalAppId, 'users', userId, 'workouts');
                 await addDoc(workoutsCollectionRef, workoutData);
                 console.log("Document successfully written!");
 
@@ -383,7 +422,7 @@
             logButton.textContent = 'Log Workout';
         });
 
-        // --- History Display Logic (No changes needed, kept for completeness) ---
+        // --- History Display Logic ---
 
         function renderHistory(workouts) {
             historyList.innerHTML = ''; 
@@ -423,13 +462,14 @@
         }
         
         function startHistoryListener() {
-            if (!db || !userId) {
-                console.error("Cannot start listener: DB or User ID unavailable.");
+            if (!db || !userId || !finalAppId) {
+                console.error("Cannot start listener: DB, User ID, or App ID unavailable.");
                 historyList.innerHTML = '<p class="text-red-500 text-center p-4">Please log in to view history.</p>';
                 return;
             }
             
-            const workoutsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'workouts');
+            // Use finalAppId for the Firestore path
+            const workoutsCollectionRef = collection(db, 'artifacts', finalAppId, 'users', userId, 'workouts');
             const workoutsQuery = query(workoutsCollectionRef);
 
             onSnapshot(workoutsQuery, (snapshot) => {
@@ -444,7 +484,7 @@
             });
         }
         
-        // --- New: Email/Password Authentication Handler ---
+        // --- Email/Password Authentication Handler ---
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -530,11 +570,11 @@
                 }
             });
         } else {
-            // Fallback for when Firebase is not initialized (e.g., missing __firebase_config on GitHub/locally)
+            // Fallback for when no Firebase configuration was provided (should be fixed now)
             console.error("Firebase configuration not found. Cannot start Authentication Listener.");
             showAuthModal();
             authTitle.textContent = 'App Configuration Error';
-            authError.textContent = "This app requires a secure Firebase configuration to run fully. If viewing on GitHub/locally, it will not function. Please use the hosting platform provided for this application.";
+            authError.textContent = "Firebase is not initialized. Please ensure your configuration is correctly placed in the script.";
             authError.classList.remove('hidden');
             authForm.classList.add('hidden');
             toggleAuthModeButton.classList.add('hidden');
