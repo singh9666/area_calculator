@@ -3,143 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Gym Log</title>
-    <!-- Load Tailwind CSS -->
+    <title>Gemini Workout Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use Inter font -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
+            background-color: #f7f7f7;
+            min-height: 100vh;
         }
         .container-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-        input:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.5);
+        .set-input-group > input {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            flex-grow: 1;
         }
-        /* Style for the Authentication Modal */
-        #auth-modal {
-            transition: opacity 0.3s ease-in-out;
+        /* Style for the searchable combobox */
+        #exercise-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-top: none;
+            z-index: 10;
+        }
+        .list-item:hover {
+            background-color: #f0f4ff;
+            cursor: pointer;
         }
     </style>
-    <!-- Load Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-    <div id="app" class="min-h-screen flex flex-col items-center p-4 sm:p-8">
+    <!-- Main Application Container -->
+    <div id="app" class="max-w-4xl mx-auto p-4 md:p-8">
+        <h1 class="text-4xl font-bold text-center text-indigo-700 mb-8">Gemini Workout Tracker</h1>
 
-        <!-- Header -->
-        <header class="w-full max-w-2xl text-center mb-8 flex justify-center items-center relative">
-            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Gemini Workout Tracker</h1>
-            <div class="absolute top-0 right-0">
-                <button id="signout-button" class="hidden text-sm text-red-500 font-medium p-2 rounded-lg hover:bg-red-50 transition duration-150 ease-in-out flex items-center">
-                    <i data-lucide="log-out" class="w-4 h-4 mr-1"></i>
-                    Sign Out
-                </button>
+        <!-- Configuration Error Message (Hidden by default) -->
+        <div id="config-error" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
+            <p class="font-bold">App Configuration Error</p>
+            <p>This app requires a secure Firebase configuration to run fully. If viewing on GitHub/locally, it will not function unless you manually insert your Firebase credentials into the code.</p>
+        </div>
+
+        <!-- Authentication/Login View (Hidden by default) -->
+        <div id="auth-view" class="flex flex-col items-center justify-center p-6 bg-white rounded-xl container-shadow max-w-md mx-auto hidden">
+            <h2 id="auth-title" class="text-2xl font-semibold mb-6 text-gray-800">Sign In</h2>
+            <input type="email" id="auth-email" placeholder="Email" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <input type="password" id="auth-password" placeholder="Password" class="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            <p id="auth-error-message" class="text-red-500 mb-4 hidden"></p>
+            <button id="auth-button" class="w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200">Sign In</button>
+            <button id="toggle-auth-mode" class="mt-4 text-sm text-indigo-600 hover:text-indigo-800">Need an account? Sign Up</button>
+        </div>
+
+        <!-- Workout Logging View (Hidden by default) -->
+        <div id="workout-view" class="hidden">
+            <div class="flex justify-between items-center mb-6">
+                <p id="user-display" class="text-lg font-medium text-gray-700"></p>
+                <button id="sign-out-button" class="bg-red-500 text-white text-sm py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200">Sign Out</button>
             </div>
-            <p id="user-info" class="absolute bottom-[-20px] text-xs text-gray-500 font-mono"></p>
-        </header>
-
-        <!-- Main Content Wrapper (Hidden until authenticated) -->
-        <div id="main-content" class="w-full max-w-2xl space-y-8 hidden">
-
-            <!-- Workout Log Form -->
-            <section id="log-section" class="bg-white p-6 rounded-xl container-shadow">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i data-lucide="dumbbell" class="w-6 h-6 mr-2 text-indigo-500"></i>
-                    Log New Exercise
-                </h2>
+            
+            <div class="bg-white p-6 rounded-xl container-shadow mb-8">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Log New Workout</h2>
                 
-                <form id="log-form" class="space-y-4">
-                    <!-- Exercise Name -->
-                    <div>
-                        <label for="exercise" class="block text-sm font-medium text-gray-700 mb-1">Exercise Name</label>
-                        <input type="text" id="exercise" placeholder="e.g., Barbell Bench Press" required
-                               class="w-full p-3 border border-gray-300 rounded-lg transition duration-150 ease-in-out">
+                <form id="log-form">
+                    <!-- Exercise Name/Selector -->
+                    <div class="mb-4 relative">
+                        <label for="exercise" class="block text-sm font-medium text-gray-700 mb-1">Exercise Name (Searchable)</label>
+                        <input type="text" id="exercise" placeholder="Start typing exercise name..." autocomplete="off" 
+                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <div id="exercise-list" class="absolute w-full bg-white rounded-b-lg shadow-lg hidden">
+                            <!-- Search results go here -->
+                        </div>
                     </div>
 
                     <!-- Sets Container -->
-                    <div id="sets-container" class="space-y-3">
-                        <!-- Set rows will be added here by JavaScript -->
+                    <div id="sets-container" class="space-y-3 mb-6">
+                        <!-- Sets will be added here by JavaScript -->
                     </div>
-
-                    <!-- Add Set Button -->
-                    <button type="button" onclick="addSetRow()" class="w-full flex items-center justify-center p-3 text-sm font-semibold text-indigo-600 border-2 border-dashed border-indigo-300 rounded-lg hover:bg-indigo-50 transition duration-150 ease-in-out">
-                        <i data-lucide="plus" class="w-5 h-5 mr-1"></i> Add Another Set
+                    
+                    <button type="button" onclick="addSetRow()" class="flex items-center text-sm text-indigo-600 hover:text-indigo-700 transition duration-200 mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        Add Another Set
                     </button>
 
                     <!-- Feedback Message -->
-                    <p id="feedback-message" class="hidden text-sm font-medium pt-2 text-green-600">Workout Logged!</p>
-
-                    <!-- Log Button -->
-                    <button type="submit" id="log-button" disabled
-                            class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
+                    <p id="feedback-message" class="text-green-600 mb-4 font-medium hidden"></p>
+                    
+                    <button type="submit" id="log-button" disabled 
+                            class="w-full bg-indigo-500 text-white p-3 rounded-lg font-semibold disabled:opacity-50 transition duration-200">
                         Log Workout
                     </button>
                 </form>
-            </section>
+            </div>
 
-            <!-- History Section -->
-            <section id="history-section" class="bg-white p-6 rounded-xl container-shadow">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i data-lucide="list-checks" class="w-6 h-6 mr-2 text-indigo-500"></i>
-                    Workout History
-                </h2>
-                <div id="history-list" class="space-y-4">
+            <!-- Workout History -->
+            <div class="bg-white p-6 rounded-xl container-shadow">
+                <h2 class="text-2xl font-semibold mb-4 text-gray-800">Workout History</h2>
+                <div id="history-container" class="space-y-6">
                     <p id="loading-history" class="text-gray-500 text-center">Loading history...</p>
+                    <!-- History will be rendered here -->
                 </div>
-            </section>
-        </div>
-
-    </div>
-
-    <!-- Authentication Modal Overlay (Initially shown if not logged in) -->
-    <div id="auth-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm">
-            <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center" id="auth-title">Sign In</h3>
-            
-            <form id="auth-form" class="space-y-4">
-                <div>
-                    <label for="auth-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" id="auth-email" placeholder="email@example.com" required
-                           class="w-full p-3 border border-gray-300 rounded-lg transition duration-150">
-                </div>
-                <div>
-                    <label for="auth-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" id="auth-password" placeholder="Min 6 characters" required minlength="6"
-                           class="w-full p-3 border border-gray-300 rounded-lg transition duration-150">
-                </div>
-                
-                <p id="auth-error" class="text-sm text-red-500 hidden"></p>
-
-                <button type="submit" id="auth-submit-button"
-                        class="w-full py-3 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out">
-                    Sign In
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <button id="toggle-auth-mode" class="text-sm text-indigo-600 hover:text-indigo-800 transition duration-150">
-                    Need an account? Sign Up
-                </button>
             </div>
         </div>
     </div>
 
-
-    <!-- Firebase Imports and Script Logic -->
+    <!-- Firebase Imports -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, query, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Set Firebase logging level to help with debugging
+        setLogLevel('Debug');
+
+        // Global Firebase variables
+        let app = null;
+        let auth = null;
+        let db = null;
+        let userId = null;
+        let isAuthReady = false;
+
+        // DOM Elements
+        const authView = document.getElementById('auth-view');
+        const workoutView = document.getElementById('workout-view');
+        const configError = document.getElementById('config-error');
+        const logForm = document.getElementById('log-form');
+        const setsContainer = document.getElementById('sets-container');
+        const logButton = document.getElementById('log-button');
+        const historyContainer = document.getElementById('history-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const userDisplay = document.getElementById('user-display');
+        const signOutButton = document.getElementById('sign-out-button');
+        
+        // Auth DOM elements
+        const authEmailInput = document.getElementById('auth-email');
+        const authPasswordInput = document.getElementById('auth-password');
+        const authButton = document.getElementById('auth-button');
+        const authTitle = document.getElementById('auth-title');
+        const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
+        const authErrorMessage = document.getElementById('auth-error-message');
+
+        // Exercise Selector DOM elements
+        const exerciseInput = document.getElementById('exercise');
+        const exerciseList = document.getElementById('exercise-list');
+        
+        // Authentication Mode State
+        let isSigningUp = false;
 
         // --- USER CONFIGURATION START ---
-        // Your Firebase configuration provided by the user is now inserted here.
-        // This configuration will be used if the secure Canvas configuration is not available.
+        // 1. If running outside the Canvas (e.g., GitHub Pages), replace the object below 
+        //    with your actual Firebase configuration object (from your Firebase project settings).
+        // 2. IMPORTANT: You must also enable **Email/Password** sign-in in your Firebase Console
+        //    under "Authentication" -> "Sign-in method."
         const CUSTOM_FIREBASE_CONFIG = {
             apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
             authDomain: "gymlog-3ef3b.firebaseapp.com",
@@ -148,172 +168,213 @@
             messagingSenderId: "139587565969",
             appId: "1:139587565969:web:90bf938d213afbc81e0230",
             measurementId: "G-5DZYYM4YN2"
-        }; 
+        };
         
-        // This App ID matches your projectId and will be used for Firestore pathing.
+        // Use a static App ID for local/GitHub hosting to match Firestore path rules
         const CUSTOM_APP_ID = "gymlog-3ef3b";
         // --- USER CONFIGURATION END ---
 
+        // Determine which config to use (Canvas provided or custom)
+        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
+            ? JSON.parse(__firebase_config) : CUSTOM_FIREBASE_CONFIG;
+        const appId = (typeof __app_id !== 'undefined' && __app_id) ? __app_id : CUSTOM_APP_ID;
 
-        // Global variables provided by the canvas environment 
-        const canvasAppId = typeof __app_id !== 'undefined' ? __app_id : null;
-        const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        
-        let db, auth, userId;
-
-        // Determine which configuration to use (Canvas first, then Custom)
-        let finalFirebaseConfig, finalAppId;
-
-        if (canvasFirebaseConfig) {
-            // Priority 1: Use secure Canvas configuration
-            finalFirebaseConfig = canvasFirebaseConfig;
-            finalAppId = canvasAppId;
-        } else if (Object.keys(CUSTOM_FIREBASE_CONFIG).length > 0 && CUSTOM_FIREBASE_CONFIG.apiKey) {
-            // Priority 2: Use manually provided custom configuration if it is non-empty and has an API key
-            finalFirebaseConfig = CUSTOM_FIREBASE_CONFIG;
-            finalAppId = CUSTOM_APP_ID;
-        } else {
-            // Priority 3: No configuration available
-            finalFirebaseConfig = null;
-            finalAppId = null;
-        }
-
-
-        const app = finalFirebaseConfig ? initializeApp(finalFirebaseConfig) : null;
-
-        if (app) {
-            db = getFirestore(app);
-            auth = getAuth(app);
-            setLogLevel('debug'); // Enable Firestore logging
-            // Set persistence to Local to keep user logged in across sessions/devices
-            setPersistence(auth, browserLocalPersistence);
-        }
-
-        // DOM elements
-        const setsContainer = document.getElementById('sets-container');
-        const logForm = document.getElementById('log-form');
-        const logButton = document.getElementById('log-button');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const historyList = document.getElementById('history-list');
-        const userInfo = document.getElementById('user-info');
-        const authModal = document.getElementById('auth-modal');
-        const mainContent = document.getElementById('main-content');
-        const authForm = document.getElementById('auth-form');
-        const authTitle = document.getElementById('auth-title');
-        const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
-        const authError = document.getElementById('auth-error');
-        const signoutButton = document.getElementById('signout-button');
-        
-        let isAuthReady = false;
-        let isSigningUp = false; // State for tracking sign-in vs sign-up mode
-
-
-        // --- UI & Utility Functions ---
-
-        /**
-         * Toggles the Sign In / Sign Up modes in the modal.
-         */
-        toggleAuthModeButton.addEventListener('click', () => {
-            isSigningUp = !isSigningUp;
-            authError.classList.add('hidden'); // Clear error message
-
-            if (isSigningUp) {
-                authTitle.textContent = 'Create Account';
-                toggleAuthModeButton.textContent = 'Already have an account? Sign In';
-                document.getElementById('auth-submit-button').textContent = 'Sign Up';
-            } else {
-                authTitle.textContent = 'Sign In';
-                toggleAuthModeButton.textContent = 'Need an account? Sign Up';
-                document.getElementById('auth-submit-button').textContent = 'Sign In';
+        // Check if config is present before initializing
+        if (firebaseConfig && firebaseConfig.apiKey) {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+            } catch (e) {
+                console.error("Firebase Initialization Failed:", e);
+                // Show config error if initialization itself fails (e.g. bad config)
+                workoutView.classList.add('hidden');
+                authView.classList.add('hidden');
+                configError.classList.remove('hidden');
             }
-        });
+        }
+
+        // --- Core App Logic ---
 
         /**
-         * Hides the login modal and shows the main content.
+         * The main entry point for the application logic after Firebase is ready.
          */
-        function showAppContent(uid) {
-            userId = uid;
-            userInfo.textContent = `User ID: ${uid}`;
-            authModal.classList.add('hidden');
-            mainContent.classList.remove('hidden');
-            signoutButton.classList.remove('hidden');
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                isAuthReady = true;
+                if (user) {
+                    // Logged In
+                    userId = user.uid;
+                    userDisplay.textContent = `User ID: ${user.uid.substring(0, 8)}... (Logged in)`;
+                    
+                    authView.classList.add('hidden');
+                    workoutView.classList.remove('hidden');
+                    configError.classList.add('hidden');
+
+                    // Setup the view (clear form, load initial set, attach listeners)
+                    logForm.reset();
+                    setsContainer.innerHTML = '';
+                    addSetRow();
+                    updateLogButtonState();
+                    attachValidationListeners();
+
+                    // Start listening to the database
+                    setupRealtimeHistory();
+                } else {
+                    // Logged Out
+                    userId = null;
+                    userDisplay.textContent = 'Guest';
+                    
+                    authView.classList.remove('hidden');
+                    workoutView.classList.add('hidden');
+                    configError.classList.add('hidden');
+                    
+                    // Reset auth view to Sign In mode
+                    isSigningUp = false;
+                    updateAuthView();
+                }
+            });
+        } else {
+            // Configuration Error (runs when auth is null because config was missing)
+            workoutView.classList.add('hidden');
+            authView.classList.add('hidden');
+            configError.classList.remove('hidden');
         }
 
         /**
-         * Shows the login modal and hides the main content.
+         * Switches between Sign In and Sign Up modes.
          */
-        function showAuthModal() {
-            authModal.classList.remove('hidden');
-            mainContent.classList.add('hidden');
-            signoutButton.classList.add('hidden');
-            userInfo.textContent = 'Please Sign In or Register';
+        function toggleAuthMode() {
+            isSigningUp = !isSigningUp;
+            authErrorMessage.classList.add('hidden');
+            updateAuthView();
+        }
+
+        function updateAuthView() {
+            authTitle.textContent = isSigningUp ? 'Sign Up' : 'Sign In';
+            authButton.textContent = isSigningUp ? 'Register' : 'Sign In';
+            toggleAuthModeButton.textContent = isSigningUp ? 'Already have an account? Sign In' : 'Need an account? Sign Up';
         }
 
         /**
-         * Signs the user out of Firebase.
+         * Handles Sign In or Sign Up based on the current mode.
          */
-        signoutButton.addEventListener('click', async () => {
+        async function handleAuth() {
+            authErrorMessage.classList.add('hidden');
+            const email = authEmailInput.value.trim();
+            const password = authPasswordInput.value.trim();
+
+            if (!email || !password) {
+                authErrorMessage.textContent = 'Please enter both email and password.';
+                authErrorMessage.classList.remove('hidden');
+                return;
+            }
+
+            authButton.disabled = true;
+            authButton.textContent = isSigningUp ? 'Registering...' : 'Signing In...';
+
+            try {
+                if (isSigningUp) {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+                // AuthStateChanged listener will handle the UI switch on success
+            } catch (error) {
+                console.error("Auth Error:", error);
+                let message = error.message;
+
+                // Provide user-friendly messages for common errors
+                if (error.code === 'auth/operation-not-allowed') {
+                     message = "Auth Error: Email/Password sign-in is disabled. Please enable it in your Firebase Console under Authentication -> Sign-in method.";
+                } else if (error.code === 'auth/weak-password') {
+                    message = "Password is too weak. Must be at least 6 characters.";
+                } else if (error.code === 'auth/email-already-in-use') {
+                    message = "This email is already registered. Try signing in.";
+                } else if (error.code === 'auth/invalid-email') {
+                    message = "The email address is not valid.";
+                } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    message = "Invalid email or password.";
+                }
+                
+                authErrorMessage.textContent = message;
+                authErrorMessage.classList.remove('hidden');
+            } finally {
+                authButton.disabled = false;
+                authButton.textContent = isSigningUp ? 'Register' : 'Sign In';
+            }
+        }
+        
+        authButton.addEventListener('click', handleAuth);
+        toggleAuthModeButton.addEventListener('click', toggleAuthMode);
+
+        // Sign Out Listener
+        signOutButton.addEventListener('click', async () => {
             try {
                 await signOut(auth);
-                // onAuthStateChanged will handle the UI update
             } catch (error) {
-                console.error("Error signing out:", error);
+                console.error("Sign Out Error:", error);
             }
         });
 
+        // --- Form Management and Validation ---
 
-        // --- Core Functions: Set Management ---
+        const EXERCISE_LIST = [
+            "Bench Press", "Squat", "Deadlift", "Overhead Press", "Barbell Row",
+            "Pull-ups", "Chin-ups", "Dips", "Lateral Raise", "Bicep Curl",
+            "Tricep Extension", "Leg Press", "Leg Extension", "Leg Curl", "Calf Raise",
+            "Shoulder Press (Dumbbell)", "Incline Press (Dumbbell)", "Cable Crossover",
+            "Seated Cable Row", "Face Pulls", "Hanging Leg Raise", "Plank",
+            "Treadmill Run", "Elliptical", "Bike Ride"
+        ];
 
         /**
-         * Creates and returns a new HTML element for a set row.
+         * Adds a new set row to the form.
          */
-        function createSetRow(setIndex) {
-            const row = document.createElement('div');
-            row.className = 'set-row flex items-center space-x-2';
-            row.innerHTML = `
-                <div class="w-10 text-center text-gray-500 font-semibold text-lg">Set ${setIndex + 1}</div>
-                <input type="number" placeholder="Reps" min="1" required
-                       class="w-1/3 p-2 border border-gray-300 rounded-lg transition duration-150"
-                       oninput="updateLogButtonState()">
-                <input type="number" placeholder="Weight (kg)" min="0" required
-                       class="w-1/3 p-2 border border-gray-300 rounded-lg transition duration-150"
-                       oninput="updateLogButtonState()">
-                <button type="button" onclick="removeSetRow(this)" 
-                        class="p-2 text-red-500 rounded-full hover:bg-red-100 transition duration-150">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+        window.addSetRow = function() {
+            const index = setsContainer.querySelectorAll('.set-row').length + 1;
+            const newRow = document.createElement('div');
+            newRow.className = 'set-row flex space-x-2 items-center';
+            newRow.innerHTML = `
+                <span class="font-semibold text-gray-700 w-8 flex-shrink-0">Set ${index}</span>
+                <div class="flex space-x-2 set-input-group flex-grow">
+                    <input type="number" min="0" step="1" placeholder="Reps" class="w-1/2" required>
+                    <input type="number" min="0" step="0.1" placeholder="Weight (kg)" class="w-1/2" required>
+                </div>
+                <button type="button" class="remove-set-btn text-red-500 hover:text-red-700 p-2 rounded-full flex-shrink-0" onclick="removeSetRow(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                    </svg>
                 </button>
             `;
-            setTimeout(() => lucide.createIcons(), 0);
-            return row;
-        }
-
-        window.addSetRow = function() {
-            const setIndex = setsContainer.querySelectorAll('.set-row').length;
-            setsContainer.appendChild(createSetRow(setIndex));
+            setsContainer.appendChild(newRow);
+            updateLogButtonState(); // Re-check button state after adding
             updateSetNumbers();
-            updateLogButtonState();
         }
 
+        /**
+         * Removes a specific set row and re-numbers the remaining rows.
+         */
         window.removeSetRow = function(button) {
-            const row = button.closest('.set-row');
-            if (row) {
-                row.remove();
-                updateSetNumbers();
-                updateLogButtonState();
-            }
+            button.closest('.set-row').remove();
+            updateSetNumbers();
+            updateLogButtonState(); // Re-check button state after removing
         }
-        
+
+        /**
+         * Re-numbers the set labels after an addition or removal.
+         */
         function updateSetNumbers() {
-            const setRows = setsContainer.querySelectorAll('.set-row');
-            setRows.forEach((row, index) => {
-                row.querySelector('div').textContent = `Set ${index + 1}`;
+            setsContainer.querySelectorAll('.set-row').forEach((row, index) => {
+                row.querySelector('span').textContent = `Set ${index + 1}`;
             });
         }
         
-        // --- Button Validation Logic ---
-
+        /**
+         * Checks if the entire form has valid data for logging.
+         */
         function checkFormValidity() {
-            const exercise = document.getElementById('exercise').value.trim();
+            const exercise = exerciseInput.value.trim();
             if (!exercise) return false;
 
             const setRows = setsContainer.querySelectorAll('.set-row');
@@ -327,6 +388,7 @@
                 const reps = parseInt(repsInput.value.trim());
                 const weight = parseFloat(weightInput.value.trim());
 
+                // A set is valid if both reps and weight are entered as positive numbers
                 if (!isNaN(reps) && reps > 0 && !isNaN(weight) && weight >= 0) {
                     hasValidSet = true;
                 }
@@ -335,72 +397,92 @@
             return hasValidSet;
         }
 
-        window.updateLogButtonState = function() {
-            if (checkFormValidity()) {
-                logButton.disabled = false;
-            } else {
-                logButton.disabled = true;
+        /**
+         * Toggles the disabled state of the Log Workout button based on form validity.
+         */
+        function updateLogButtonState() {
+            if (logButton) {
+                logButton.disabled = !checkFormValidity();
             }
         }
 
+        /**
+         * Attaches event listeners to form fields to trigger the button state update.
+         */
         function attachValidationListeners() {
-            document.getElementById('exercise').addEventListener('input', updateLogButtonState);
-            setsContainer.addEventListener('input', updateLogButtonState); 
-            
-            const addSetButton = document.querySelector('button[onclick="addSetRow()"]');
-            if (addSetButton) {
-                 addSetButton.addEventListener('click', updateLogButtonState);
-            } else {
-                console.warn("Could not find 'Add Another Set' button for listener.");
-            }
+            exerciseInput.addEventListener('input', updateLogButtonState);
+            setsContainer.addEventListener('input', updateLogButtonState);
         }
+
+        // --- Exercise Selector Logic ---
         
-        // --- Core Functions: Data & Saving ---
+        /**
+         * Filters the list and updates the combobox display.
+         */
+        exerciseInput.addEventListener('input', () => {
+            const query = exerciseInput.value.toLowerCase();
+            exerciseList.innerHTML = '';
 
-        async function saveWorkout(workoutData) {
-            // finalAppId is guaranteed to be available here if 'auth' is initialized.
-            if (!db || !userId || !finalAppId) {
-                console.error("Database, User ID, or App ID is not ready. Cannot save data.");
-                return;
-            }
-            
-            try {
-                // Use finalAppId to ensure data is stored in the correct path under your project ID
-                const workoutsCollectionRef = collection(db, 'artifacts', finalAppId, 'users', userId, 'workouts');
-                await addDoc(workoutsCollectionRef, workoutData);
-                console.log("Document successfully written!");
-
-                feedbackMessage.textContent = 'Workout Logged successfully!';
-                feedbackMessage.classList.remove('hidden', 'text-red-600');
-                feedbackMessage.classList.add('text-green-600');
-
-            } catch (error) {
-                console.error("Error writing document: ", error);
+            if (query.length > 0) {
+                const filtered = EXERCISE_LIST.filter(ex => ex.toLowerCase().includes(query));
                 
-                feedbackMessage.textContent = 'Error logging workout. See console for details.';
-                feedbackMessage.classList.remove('hidden', 'text-green-600');
-                feedbackMessage.classList.add('text-red-600');
+                if (filtered.length > 0) {
+                    filtered.slice(0, 5).forEach(ex => {
+                        const item = document.createElement('div');
+                        item.className = 'list-item p-2 border-b border-gray-200';
+                        item.textContent = ex;
+                        item.addEventListener('click', () => {
+                            exerciseInput.value = ex;
+                            exerciseList.classList.add('hidden');
+                            updateLogButtonState();
+                        });
+                        exerciseList.appendChild(item);
+                    });
+                    exerciseList.classList.remove('hidden');
+                } else {
+                    exerciseList.classList.add('hidden');
+                }
+            } else {
+                exerciseList.classList.add('hidden');
             }
+        });
+        
+        // Hide list when input loses focus (with a slight delay to allow clicking an item)
+        exerciseInput.addEventListener('blur', () => {
+             setTimeout(() => {
+                 if (exerciseList) exerciseList.classList.add('hidden');
+             }, 200);
+        });
 
-            setTimeout(() => {
-                feedbackMessage.classList.add('hidden');
-                feedbackMessage.classList.remove('text-red-600', 'text-green-600');
-            }, 5000);
-        }
+        // Show list when input gains focus if text is present
+        exerciseInput.addEventListener('focus', () => {
+            if (exerciseInput.value.length > 0) {
+                exerciseInput.dispatchEvent(new Event('input')); // Re-run filter logic
+            }
+        });
+
+        // --- Firestore Saving Logic ---
 
         logForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            if (logButton.disabled) return;
+            
             logButton.disabled = true;
             logButton.textContent = 'Saving...';
+            feedbackMessage.classList.add('hidden');
 
-            const exerciseName = document.getElementById('exercise').value.trim();
+            const exerciseName = exerciseInput.value.trim();
             const setRows = setsContainer.querySelectorAll('.set-row');
             
+            // Build the sets array
             const sets = [];
             setRows.forEach(row => {
-                const reps = parseInt(row.querySelector('input[placeholder="Reps"]').value.trim());
-                const weight = parseFloat(row.querySelector('input[placeholder="Weight (kg)"]').value.trim());
+                const repsInput = row.querySelector('input[placeholder="Reps"]');
+                const weightInput = row.querySelector('input[placeholder="Weight (kg)"]');
+
+                const reps = parseInt(repsInput.value.trim());
+                const weight = parseFloat(weightInput.value.trim());
 
                 if (!isNaN(reps) && reps > 0 && !isNaN(weight) && weight >= 0) {
                     sets.push({ reps, weight });
@@ -410,188 +492,138 @@
             const workoutData = {
                 exercise: exerciseName,
                 sets: sets,
-                timestamp: new Date().getTime(),
-                date: new Date().toLocaleDateString()
+                // Superset-ready structure: a workout is a collection of sets
+                // We'll use the timestamp for sorting
+                timestamp: serverTimestamp() 
             };
 
-            await saveWorkout(workoutData);
-
-            logForm.reset();
-            setsContainer.innerHTML = '';
-            addSetRow();
-            logButton.textContent = 'Log Workout';
-        });
-
-        // --- History Display Logic ---
-
-        function renderHistory(workouts) {
-            historyList.innerHTML = ''; 
-
-            if (workouts.length === 0) {
-                historyList.innerHTML = '<p class="text-gray-500 text-center p-4">No workouts logged yet. Start lifting!</p>';
-                return;
-            }
-
-            workouts.sort((a, b) => b.timestamp - a.timestamp);
-
-            workouts.forEach(workout => {
-                const workoutElement = document.createElement('div');
-                workoutElement.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200';
-                
-                const formattedDate = new Date(workout.timestamp).toLocaleString('en-US', {
-                    month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-
-                let setsHTML = workout.sets.map((set, index) => `
-                    <li class="flex justify-between items-center text-sm">
-                        <span class="text-gray-600">Set ${index + 1}:</span>
-                        <span class="font-medium">${set.reps} reps @ ${set.weight} kg</span>
-                    </li>
-                `).join('');
-
-                workoutElement.innerHTML = `
-                    <div class="font-bold text-lg text-indigo-700">${workout.exercise}</div>
-                    <div class="text-xs text-gray-500 mb-2">${formattedDate}</div>
-                    <ul class="space-y-1 mt-2 p-2 bg-white rounded-md border border-gray-100">
-                        ${setsHTML}
-                    </ul>
-                `;
-
-                historyList.appendChild(workoutElement);
-            });
-        }
-        
-        function startHistoryListener() {
-            if (!db || !userId || !finalAppId) {
-                console.error("Cannot start listener: DB, User ID, or App ID unavailable.");
-                historyList.innerHTML = '<p class="text-red-500 text-center p-4">Please log in to view history.</p>';
-                return;
-            }
-            
-            // Use finalAppId for the Firestore path
-            const workoutsCollectionRef = collection(db, 'artifacts', finalAppId, 'users', userId, 'workouts');
-            const workoutsQuery = query(workoutsCollectionRef);
-
-            onSnapshot(workoutsQuery, (snapshot) => {
-                const workouts = [];
-                snapshot.forEach((doc) => {
-                    workouts.push({ id: doc.id, ...doc.data() });
-                });
-                renderHistory(workouts);
-            }, (error) => {
-                console.error("Error listening to history data: ", error);
-                historyList.innerHTML = '<p class="text-red-500 text-center p-4">Error loading history.</p>';
-            });
-        }
-        
-        // --- Email/Password Authentication Handler ---
-
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!auth) {
-                authError.textContent = "Cannot connect to Firebase Auth. Check console for initialization errors.";
-                authError.classList.remove('hidden');
-                return;
-            }
-
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const submitButton = document.getElementById('auth-submit-button');
-            
-            authError.classList.add('hidden'); // Clear previous errors
-            submitButton.disabled = true;
-            submitButton.textContent = isSigningUp ? 'Registering...' : 'Signing In...';
+            const workoutsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'workouts');
 
             try {
-                if (isSigningUp) {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                } else {
-                    await signInWithEmailAndPassword(auth, email, password);
-                }
-                // AuthStateChanged handles the success case (UI update)
+                await addDoc(workoutsCollectionRef, workoutData);
+                
+                // Success feedback
+                feedbackMessage.textContent = 'Workout logged successfully!';
+                feedbackMessage.classList.remove('text-red-600', 'hidden');
+                feedbackMessage.classList.add('text-green-600');
+                
+                // Reset form (keep one empty set row)
+                logForm.reset();
+                setsContainer.innerHTML = '';
+                addSetRow();
+                updateLogButtonState();
+
             } catch (error) {
-                let errorMessage = "An unknown error occurred.";
-                // Map common Firebase errors to user-friendly messages
-                switch (error.code) {
-                    case 'auth/operation-not-allowed':
-                        errorMessage = "Authentication failed. The **Email/Password provider is disabled** in your Firebase project settings. You must enable it in the Firebase Console under **Authentication -> Sign-in method**.";
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = "Invalid email address format.";
-                        break;
-                    case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        errorMessage = "Invalid email or password.";
-                        break;
-                    case 'auth/email-already-in-use':
-                        errorMessage = "This email is already registered. Please sign in.";
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = "Password should be at least 6 characters.";
-                        break;
-                    default:
-                        console.error("Auth Error:", error);
-                        errorMessage = error.message;
-                        break;
-                }
-                authError.textContent = errorMessage;
-                authError.classList.remove('hidden');
+                console.error("Error writing document: ", error);
+                
+                // Failure feedback
+                feedbackMessage.textContent = 'Error logging workout. Check console for details.';
+                feedbackMessage.classList.remove('text-green-600', 'hidden');
+                feedbackMessage.classList.add('text-red-600');
+                
             } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = isSigningUp ? 'Sign Up' : 'Sign In';
+                // Ensure the button is re-enabled regardless of success/failure
+                logButton.textContent = 'Log Workout';
+                updateLogButtonState(); 
+                
+                setTimeout(() => {
+                    feedbackMessage.classList.add('hidden');
+                    feedbackMessage.classList.remove('text-red-600');
+                    feedbackMessage.classList.add('text-green-600');
+                }, 5000);
             }
         });
 
+        // --- Firestore Reading and Deleting Logic ---
 
-        // --- Final Initialization and State Listener ---
+        function setupRealtimeHistory() {
+            if (!db || !userId) return;
 
-        if (auth) {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // User is signed in (Email/Password)
-                    showAppContent(user.uid);
-                    
-                    if (setsContainer.querySelectorAll('.set-row').length === 0) {
-                        addSetRow();
-                    }
+            const workoutsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'workouts');
+            
+            // Query: Get all workouts, ordered by timestamp descending
+            // Note: While orderBy is in use, Firestore may require an index for this.
+            // For robust use, consider sorting in-memory. For now, we use the query.
+            const q = query(workoutsCollectionRef, orderBy('timestamp', 'desc'));
 
-                    if (!isAuthReady) {
-                        // Only run once on first successful login
-                        attachValidationListeners(); 
-                        updateLogButtonState();
-                        startHistoryListener();
-                        isAuthReady = true;
-                    }
-                } else {
-                    // User is signed out
-                    showAuthModal();
-                    isAuthReady = false; // Reset auth ready state for next login
-                }
+            // Real-time listener
+            onSnapshot(q, (snapshot) => {
+                const workouts = [];
+                snapshot.forEach(doc => {
+                    workouts.push({ id: doc.id, ...doc.data() });
+                });
+
+                renderHistory(workouts);
+            }, (error) => {
+                console.error("Error reading history: ", error);
+                historyContainer.innerHTML = `<p class="text-red-500 text-center">Failed to load history: ${error.message}</p>`;
             });
-        } else {
-            // Fallback for when no Firebase configuration was provided (should be fixed now)
-            console.error("Firebase configuration not found. Cannot start Authentication Listener.");
-            showAuthModal();
-            authTitle.textContent = 'App Configuration Error';
-            authError.textContent = "Firebase is not initialized. Please ensure your configuration is correctly placed in the script.";
-            authError.classList.remove('hidden');
-            authForm.classList.add('hidden');
-            toggleAuthModeButton.classList.add('hidden');
         }
 
-
-        // Initialize Lucide icons on window load for initial elements
-        window.addEventListener('load', () => {
-             if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
+        function renderHistory(workouts) {
+            historyContainer.innerHTML = ''; // Clear existing history
+            document.getElementById('loading-history').classList.add('hidden');
+            
+            if (workouts.length === 0) {
+                historyContainer.innerHTML = `<p class="text-gray-500 text-center p-4">No workouts logged yet. Go lift something!</p>`;
+                return;
             }
-            // Add a default set row when the app loads (if Firebase is ready)
-            if (auth && setsContainer.querySelectorAll('.set-row').length === 0) {
-                addSetRow();
-            }
-        });
 
+            workouts.forEach(workout => {
+                // Format the date
+                const date = workout.timestamp ? new Date(workout.timestamp.seconds * 1000).toLocaleString() : 'Saving...';
+                
+                // Build sets list
+                const setsHtml = workout.sets.map((set, index) => `
+                    <div class="flex justify-between text-sm text-gray-600 border-b border-gray-100 py-1">
+                        <span>Set ${index + 1}</span>
+                        <span>${set.reps} Reps @ ${set.weight} kg</span>
+                    </div>
+                `).join('');
+
+                const workoutElement = document.createElement('div');
+                workoutElement.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200';
+                workoutElement.innerHTML = `
+                    <div class="flex justify-between items-center mb-2 border-b pb-2">
+                        <h3 class="text-xl font-bold text-indigo-700">${workout.exercise}</h3>
+                        <div class="flex items-center space-x-2">
+                            <p class="text-sm text-gray-500">${date}</p>
+                            <button class="delete-workout-btn text-red-500 hover:text-red-700 transition duration-200" 
+                                    data-id="${workout.id}" onclick="deleteWorkout('${workout.id}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    ${setsHtml}
+                `;
+                historyContainer.appendChild(workoutElement);
+            });
+        }
+        
+        /**
+         * Deletes a workout document from Firestore.
+         */
+        window.deleteWorkout = async function(docId) {
+            if (!db || !userId) return;
+
+            const confirmDelete = prompt("Type 'DELETE' to confirm you want to permanently delete this workout.");
+            if (confirmDelete !== 'DELETE') return;
+            
+            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'workouts', docId);
+
+            try {
+                // Delete the document
+                await deleteDoc(docRef);
+                console.log(`Workout document ${docId} successfully deleted.`);
+                // The onSnapshot listener will automatically update the UI
+            } catch (error) {
+                console.error("Error deleting document: ", error);
+                alert('Failed to delete workout. Check console for details.');
+            }
+        }
+        
     </script>
 </body>
 </html>
