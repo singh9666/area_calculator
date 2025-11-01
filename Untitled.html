@@ -1189,4 +1189,435 @@
             if (userWorkouts.length > 0) {
                 const lastWorkout = userWorkouts[0];
                 const workoutDate = lastWorkout.date?.toDate ? lastWorkout.date.toDate() : new Date(lastWorkout.date);
-               
+                lastWorkoutEl.textContent = workoutDate.toLocaleDateString();
+            } else {
+                lastWorkoutEl.textContent = '-';
+            }
+            
+            currentStreakEl.textContent = calculateStreak();
+            renderWorkoutHistory();
+        }
+
+        function calculateStreak() {
+            if (userWorkouts.length === 0) return 0;
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let streak = 0;
+            let checkDate = new Date(today);
+            
+            while (true) {
+                const hasWorkout = userWorkouts.some(workout => {
+                    const workoutDate = workout.date?.toDate ? workout.date.toDate() : new Date(workout.date);
+                    workoutDate.setHours(0, 0, 0, 0);
+                    return workoutDate.getTime() === checkDate.getTime();
+                });
+                
+                if (hasWorkout) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        function renderWorkoutHistory() {
+            workoutHistoryList.innerHTML = '';
+            
+            if (userWorkouts.length === 0) {
+                workoutHistoryList.innerHTML = '<div class="history-item">No workouts yet. Start logging your workouts!</div>';
+                return;
+            }
+            
+            userWorkouts.slice(0, 5).forEach(workout => {
+                const workoutDate = workout.date?.toDate ? workout.date.toDate() : new Date(workout.date);
+                const exerciseCount = workout.exercises.length;
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="history-date">${workoutDate.toLocaleDateString()}</div>
+                        <div class="history-exercises">${workout.name} - ${exerciseCount} exercise${exerciseCount !== 1 ? 's' : ''}</div>
+                    </div>
+                    <div>
+                        <button class="btn-small btn-secondary" onclick="viewWorkout('${workout.id}')">View</button>
+                    </div>
+                `;
+                
+                workoutHistoryList.appendChild(historyItem);
+            });
+        }
+
+        // Exercise management functions
+        function renderExercises() {
+            exerciseList.innerHTML = '';
+            
+            if (userExercises.length === 0) {
+                exerciseList.innerHTML = '<div class="exercise-card">No exercises found. Add your first exercise!</div>';
+                return;
+            }
+            
+            userExercises.forEach(exercise => {
+                const exerciseCard = document.createElement('div');
+                exerciseCard.className = 'exercise-card';
+                exerciseCard.innerHTML = `
+                    <h3>${exercise.name}</h3>
+                    <p><strong>Category:</strong> ${exercise.category}</p>
+                    <p>${exercise.description}</p>
+                    <div class="exercise-actions">
+                        <button class="btn btn-small btn-secondary" onclick="editExercise('${exercise.id}')">Edit</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteExercise('${exercise.id}')">Delete</button>
+                    </div>
+                `;
+                
+                exerciseList.appendChild(exerciseCard);
+            });
+        }
+
+        async function addNewExercise() {
+            const name = prompt('Enter exercise name:');
+            if (!name) return;
+            
+            const category = prompt('Enter exercise category (e.g., Chest, Legs, Back):');
+            if (!category) return;
+            
+            const description = prompt('Enter exercise description:');
+            
+            try {
+                const exerciseRef = await db.collection('exercises').add({
+                    name,
+                    category,
+                    description: description || '',
+                    userId: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                userExercises.push({
+                    id: exerciseRef.id,
+                    name,
+                    category,
+                    description: description || '',
+                    userId: currentUser.uid
+                });
+                
+                renderExercises();
+                analytics.logEvent('exercise_created');
+                
+            } catch (error) {
+                alert('Error adding exercise: ' + error.message);
+            }
+        }
+
+        async function editExercise(id) {
+            const exercise = userExercises.find(ex => ex.id === id);
+            if (!exercise) return;
+            
+            const name = prompt('Enter exercise name:', exercise.name);
+            if (!name) return;
+            
+            const category = prompt('Enter exercise category:', exercise.category);
+            if (!category) return;
+            
+            const description = prompt('Enter exercise description:', exercise.description);
+            
+            try {
+                await db.collection('exercises').doc(id).update({
+                    name,
+                    category,
+                    description: description || ''
+                });
+                
+                const index = userExercises.findIndex(ex => ex.id === id);
+                userExercises[index] = {
+                    ...userExercises[index],
+                    name,
+                    category,
+                    description: description || ''
+                };
+                
+                renderExercises();
+            } catch (error) {
+                alert('Error updating exercise: ' + error.message);
+            }
+        }
+
+        async function deleteExercise(id) {
+            if (!confirm('Are you sure you want to delete this exercise?')) return;
+            
+            try {
+                await db.collection('exercises').doc(id).delete();
+                
+                userExercises = userExercises.filter(ex => ex.id !== id);
+                
+                renderExercises();
+            } catch (error) {
+                alert('Error deleting exercise: ' + error.message);
+            }
+        }
+
+        // Workout logging functions
+        function initializeWorkoutForm() {
+            const now = new Date();
+            const formattedDate = now.toISOString().slice(0, 16);
+            document.getElementById('workout-date').value = formattedDate;
+            
+            exercisesContainer.innerHTML = '';
+            addExerciseToWorkoutForm();
+        }
+
+        function addExerciseToWorkoutForm() {
+            const exerciseId = `exercise-${Date.now()}`;
+            
+            const exerciseDiv = document.createElement('div');
+            exerciseDiv.className = 'exercise-entry';
+            exerciseDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Exercise</label>
+                    <select class="form-control exercise-select">
+                        <option value="">Select an exercise</option>
+                        ${userExercises.map(ex => 
+                            `<option value="${ex.id}">${ex.name} (${ex.category})</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                
+                <div class="sets-container">
+                    <div class="set" data-set="1">
+                        <div class="set-header">
+                            <span class="set-number">Set 1</span>
+                            <button type="button" class="remove-set" onclick="removeSet(this)">×</button>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Reps</label>
+                                <input type="number" class="form-control reps" placeholder="10" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>Weight (lbs)</label>
+                                <input type="number" class="form-control weight" placeholder="100" min="0" step="0.5">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="add-set" onclick="addSet(this)">
+                    <i class="fas fa-plus"></i> Add Set
+                </button>
+            `;
+            
+            exercisesContainer.appendChild(exerciseDiv);
+        }
+
+        function addSet(button) {
+            const setsContainer = button.previousElementSibling;
+            const setCount = setsContainer.children.length;
+            const newSetNum = setCount + 1;
+            
+            const setDiv = document.createElement('div');
+            setDiv.className = 'set';
+            setDiv.setAttribute('data-set', newSetNum);
+            setDiv.innerHTML = `
+                <div class="set-header">
+                    <span class="set-number">Set ${newSetNum}</span>
+                    <button type="button" class="remove-set" onclick="removeSet(this)">×</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Reps</label>
+                        <input type="number" class="form-control reps" placeholder="10" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (lbs)</label>
+                        <input type="number" class="form-control weight" placeholder="100" min="0" step="0.5">
+                    </div>
+                </div>
+            `;
+            
+            setsContainer.appendChild(setDiv);
+        }
+
+        function removeSet(button) {
+            const setDiv = button.closest('.set');
+            const setsContainer = setDiv.parentElement;
+            
+            if (setsContainer.children.length > 1) {
+                setDiv.remove();
+                
+                Array.from(setsContainer.children).forEach((set, index) => {
+                    const setNumber = index + 1;
+                    set.setAttribute('data-set', setNumber);
+                    set.querySelector('.set-number').textContent = `Set ${setNumber}`;
+                });
+            }
+        }
+
+        async function saveWorkout() {
+            const name = document.getElementById('workout-name').value;
+            const date = document.getElementById('workout-date').value;
+            
+            if (!name) {
+                alert('Please enter a workout name');
+                return;
+            }
+            
+            if (!date) {
+                alert('Please select a date and time');
+                return;
+            }
+            
+            const exerciseEntries = document.querySelectorAll('.exercise-entry');
+            const workoutExercises = [];
+            
+            exerciseEntries.forEach(entry => {
+                const exerciseSelect = entry.querySelector('.exercise-select');
+                const exerciseId = exerciseSelect.value;
+                
+                if (!exerciseId) return;
+                
+                const sets = [];
+                const setElements = entry.querySelectorAll('.set');
+                
+                setElements.forEach(setEl => {
+                    const reps = setEl.querySelector('.reps').value;
+                    const weight = setEl.querySelector('.weight').value;
+                    
+                    if (reps && weight) {
+                        sets.push({
+                            reps: parseInt(reps),
+                            weight: parseFloat(weight)
+                        });
+                    }
+                });
+                
+                if (sets.length > 0) {
+                    workoutExercises.push({
+                        exerciseId,
+                        sets
+                    });
+                }
+            });
+            
+            if (workoutExercises.length === 0) {
+                alert('Please add at least one exercise with sets');
+                return;
+            }
+            
+            try {
+                saveWorkoutBtn.disabled = true;
+                saveWorkoutBtn.textContent = 'Saving...';
+                
+                const workoutRef = await db.collection('workouts').add({
+                    name,
+                    date: new Date(date),
+                    exercises: workoutExercises,
+                    userId: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                userWorkouts.unshift({
+                    id: workoutRef.id,
+                    name,
+                    date: new Date(date),
+                    exercises: workoutExercises,
+                    userId: currentUser.uid
+                });
+                
+                analytics.logEvent('workout_created');
+                alert('Workout saved successfully!');
+                showDashboard();
+                updateDashboard();
+            } catch (error) {
+                alert('Error saving workout: ' + error.message);
+            } finally {
+                saveWorkoutBtn.disabled = false;
+                saveWorkoutBtn.textContent = 'Save Workout';
+            }
+        }
+
+        function viewWorkout(id) {
+            const workout = userWorkouts.find(w => w.id === id);
+            if (!workout) return;
+            
+            let workoutDetails = `Workout: ${workout.name}\nDate: ${new Date(workout.date).toLocaleString()}\n\n`;
+            
+            workout.exercises.forEach(exerciseEntry => {
+                const exercise = userExercises.find(ex => ex.id === exerciseEntry.exerciseId);
+                if (exercise) {
+                    workoutDetails += `${exercise.name}:\n`;
+                    
+                    exerciseEntry.sets.forEach((set, index) => {
+                        workoutDetails += `  Set ${index + 1}: ${set.reps} reps × ${set.weight} lbs\n`;
+                    });
+                    
+                    workoutDetails += '\n';
+                }
+            });
+            
+            alert(workoutDetails);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auth state observer
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    showApp();
+                } else {
+                    currentUser = null;
+                    showAuth();
+                }
+            });
+            
+            // Auth event listeners
+            loginBtn.addEventListener('click', login);
+            registerBtn.addEventListener('click', register);
+            showRegister.addEventListener('click', showRegisterForm);
+            showLogin.addEventListener('click', showLoginForm);
+            
+            // Desktop navigation event listeners
+            navDashboard.addEventListener('click', showDashboard);
+            navExercises.addEventListener('click', showExercises);
+            navLogWorkout.addEventListener('click', showWorkoutLogging);
+            navLogout.addEventListener('click', logout);
+            
+            // Mobile navigation event listeners
+            mobileNavDashboard.addEventListener('click', showDashboard);
+            mobileNavExercises.addEventListener('click', showExercises);
+            mobileNavLogWorkout.addEventListener('click', showWorkoutLogging);
+            mobileNavLogout.addEventListener('click', logout);
+            
+            // Menu toggle
+            menuToggle.addEventListener('click', toggleMobileMenu);
+            document.addEventListener('click', closeMobileMenu);
+            
+            // Exercise management event listeners
+            addExerciseBtn.addEventListener('click', addNewExercise);
+            
+            // Workout logging event listeners
+            addExerciseToWorkout.addEventListener('click', addExerciseToWorkoutForm);
+            saveWorkoutBtn.addEventListener('click', saveWorkout);
+            
+            // Enter key support for forms
+            document.getElementById('login-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') login();
+            });
+            
+            document.getElementById('register-confirm').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') register();
+            });
+        });
+
+        // Make functions available globally for onclick handlers
+        window.editExercise = editExercise;
+        window.deleteExercise = deleteExercise;
+        window.addSet = addSet;
+        window.removeSet = removeSet;
+        window.viewWorkout = viewWorkout;
+    </script>
+</body>
+</html>
