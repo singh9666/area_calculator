@@ -64,6 +64,29 @@
                 <button id="sign-out-button" class="bg-red-500 text-white text-sm py-2 px-4 rounded-lg hover:bg-red-600 transition duration-200">Sign Out</button>
             </div>
             
+            <!-- Exercise List Management (New Section) -->
+            <div class="bg-white p-6 rounded-xl container-shadow mb-8">
+                <button onclick="toggleExerciseManager()" class="w-full text-left flex justify-between items-center text-xl font-semibold text-gray-800 focus:outline-none">
+                    <span>Manage My Exercise List</span>
+                    <span id="manager-toggle-icon" class="transform transition duration-300">+</span>
+                </button>
+                
+                <div id="exercise-manager" class="mt-4 space-y-4 hidden pt-4 border-t border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-700">Add New Exercise</h3>
+                    <div class="flex space-x-2">
+                        <input type="text" id="new-exercise-input" placeholder="e.g., Bulgarian Split Squat" 
+                               class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <button id="add-exercise-button" class="bg-green-500 text-white p-3 rounded-lg font-semibold hover:bg-green-600 transition duration-200">Add</button>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-gray-700 mt-6">Current Exercises</h3>
+                    <div id="current-exercise-list" class="space-y-2">
+                        <!-- List of user's exercises will be rendered here -->
+                        <p id="list-loading-message" class="text-gray-500">Loading custom list...</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl container-shadow mb-8">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-800">Log New Workout</h2>
                 
@@ -111,11 +134,11 @@
         </div>
     </div>
 
-    <!-- Firebase Imports -->
+    <!-- Firebase Imports and Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, onSnapshot, collection, query, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, addDoc, onSnapshot, collection, query, orderBy, serverTimestamp, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Set Firebase logging level to help with debugging
@@ -127,8 +150,11 @@
         let db = null;
         let userId = null;
         let isAuthReady = false;
+        
+        // Exercise List State
+        let currentExerciseList = [];
 
-        // DOM Elements
+        // DOM Elements for Logging/History
         const authView = document.getElementById('auth-view');
         const workoutView = document.getElementById('workout-view');
         const configError = document.getElementById('config-error');
@@ -139,27 +165,33 @@
         const feedbackMessage = document.getElementById('feedback-message');
         const userDisplay = document.getElementById('user-display');
         const signOutButton = document.getElementById('sign-out-button');
+        const exerciseInput = document.getElementById('exercise');
+        const exerciseList = document.getElementById('exercise-list');
         
-        // Auth DOM elements
+        // DOM Elements for Auth
         const authEmailInput = document.getElementById('auth-email');
         const authPasswordInput = document.getElementById('auth-password');
         const authButton = document.getElementById('auth-button');
         const authTitle = document.getElementById('auth-title');
         const toggleAuthModeButton = document.getElementById('toggle-auth-mode');
         const authErrorMessage = document.getElementById('auth-error-message');
-
-        // Exercise Selector DOM elements
-        const exerciseInput = document.getElementById('exercise');
-        const exerciseList = document.getElementById('exercise-list');
         
+        // DOM Elements for Exercise Management
+        const exerciseManager = document.getElementById('exercise-manager');
+        const managerToggleIcon = document.getElementById('manager-toggle-icon');
+        const newExerciseInput = document.getElementById('new-exercise-input');
+        const addExerciseButton = document.getElementById('add-exercise-button');
+        const currentExerciseListContainer = document.getElementById('current-exercise-list');
+        const listLoadingMessage = document.getElementById('list-loading-message');
+
         // Authentication Mode State
         let isSigningUp = false;
 
         // --- USER CONFIGURATION START ---
         // 1. If running outside the Canvas (e.g., GitHub Pages), replace the object below 
-        //    with your actual Firebase configuration object (from your Firebase project settings).
+        //    with your actual Firebase configuration object.
         // 2. IMPORTANT: You must also enable **Email/Password** sign-in in your Firebase Console
-        //    under "Authentication" -> "Sign-in method."
+        //    under Authentication -> Sign-in method.
         const CUSTOM_FIREBASE_CONFIG = {
             apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
             authDomain: "gymlog-3ef3b.firebaseapp.com",
@@ -178,6 +210,9 @@
         const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
             ? JSON.parse(__firebase_config) : CUSTOM_FIREBASE_CONFIG;
         const appId = (typeof __app_id !== 'undefined' && __app_id) ? __app_id : CUSTOM_APP_ID;
+        
+        // Document path helper for the exercise list
+        const EXERCISE_DOC_REF = (uid) => doc(db, 'artifacts', appId, 'users', uid, 'config', 'exercise_list');
 
         // Check if config is present before initializing
         if (firebaseConfig && firebaseConfig.apiKey) {
@@ -194,11 +229,19 @@
             }
         }
 
-        // --- Core App Logic ---
+        // --- Default Exercise List ---
+        const DEFAULT_EXERCISE_LIST = [
+            "Bench Press", "Squat", "Deadlift", "Overhead Press", "Barbell Row",
+            "Pull-ups", "Chin-ups", "Dips", "Lateral Raise", "Bicep Curl",
+            "Tricep Extension", "Leg Press", "Leg Extension", "Leg Curl", "Calf Raise",
+            "Shoulder Press (Dumbbell)", "Incline Press (Dumbbell)", "Cable Crossover",
+            "Seated Cable Row", "Face Pulls", "Hanging Leg Raise", "Plank",
+            "Treadmill Run", "Elliptical", "Bike Ride", "Hip Thrust", "Romanian Deadlift"
+        ];
+        // --- End Default Exercise List ---
 
-        /**
-         * The main entry point for the application logic after Firebase is ready.
-         */
+
+        // --- Core App Logic ---
         if (auth) {
             onAuthStateChanged(auth, (user) => {
                 isAuthReady = true;
@@ -218,6 +261,9 @@
                     updateLogButtonState();
                     attachValidationListeners();
 
+                    // NEW: Setup the listener for the custom exercise list
+                    setupExerciseListListener();
+                    
                     // Start listening to the database
                     setupRealtimeHistory();
                 } else {
@@ -240,6 +286,8 @@
             authView.classList.add('hidden');
             configError.classList.remove('hidden');
         }
+
+        // --- Authentication/UI Functions ---
 
         /**
          * Switches between Sign In and Sign Up modes.
@@ -318,15 +366,6 @@
         });
 
         // --- Form Management and Validation ---
-
-        const EXERCISE_LIST = [
-            "Bench Press", "Squat", "Deadlift", "Overhead Press", "Barbell Row",
-            "Pull-ups", "Chin-ups", "Dips", "Lateral Raise", "Bicep Curl",
-            "Tricep Extension", "Leg Press", "Leg Extension", "Leg Curl", "Calf Raise",
-            "Shoulder Press (Dumbbell)", "Incline Press (Dumbbell)", "Cable Crossover",
-            "Seated Cable Row", "Face Pulls", "Hanging Leg Raise", "Plank",
-            "Treadmill Run", "Elliptical", "Bike Ride"
-        ];
 
         /**
          * Adds a new set row to the form.
@@ -414,7 +453,7 @@
             setsContainer.addEventListener('input', updateLogButtonState);
         }
 
-        // --- Exercise Selector Logic ---
+        // --- Exercise Selector Logic (Now uses currentExerciseList) ---
         
         /**
          * Filters the list and updates the combobox display.
@@ -424,7 +463,8 @@
             exerciseList.innerHTML = '';
 
             if (query.length > 0) {
-                const filtered = EXERCISE_LIST.filter(ex => ex.toLowerCase().includes(query));
+                // Use the dynamic currentExerciseList
+                const filtered = currentExerciseList.filter(ex => ex.toLowerCase().includes(query));
                 
                 if (filtered.length > 0) {
                     filtered.slice(0, 5).forEach(ex => {
@@ -456,12 +496,134 @@
 
         // Show list when input gains focus if text is present
         exerciseInput.addEventListener('focus', () => {
-            if (exerciseInput.value.length > 0) {
+            if (exerciseInput.value.length > 0 || currentExerciseList.length > 0) {
                 exerciseInput.dispatchEvent(new Event('input')); // Re-run filter logic
             }
         });
 
-        // --- Firestore Saving Logic ---
+        // --- Exercise List Management Logic ---
+
+        window.toggleExerciseManager = function() {
+            const isHidden = exerciseManager.classList.contains('hidden');
+            if (isHidden) {
+                exerciseManager.classList.remove('hidden');
+                managerToggleIcon.classList.add('rotate-45');
+            } else {
+                exerciseManager.classList.add('hidden');
+                managerToggleIcon.classList.remove('rotate-45');
+            }
+        }
+
+        /**
+         * Sets up a real-time listener for the user's custom exercise list in Firestore.
+         */
+        function setupExerciseListListener() {
+            if (!db || !userId) return;
+
+            onSnapshot(EXERCISE_DOC_REF(userId), async (docSnapshot) => {
+                let fetchedList = [];
+                if (docSnapshot.exists() && docSnapshot.data().exercises) {
+                    fetchedList = docSnapshot.data().exercises;
+                } else {
+                    // If document doesn't exist, initialize with defaults
+                    console.log("No custom exercise list found. Initializing with defaults.");
+                    fetchedList = DEFAULT_EXERCISE_LIST;
+                    // Save the defaults immediately so the user can modify them
+                    await setDoc(EXERCISE_DOC_REF(userId), { exercises: DEFAULT_EXERCISE_LIST }, { merge: false });
+                }
+
+                // Update the state and sort it alphabetically
+                currentExerciseList = fetchedList.sort((a, b) => a.localeCompare(b)); 
+                renderManagerList();
+                // Re-trigger the search input update in case the list changed while typing
+                exerciseInput.dispatchEvent(new Event('input')); 
+
+            }, (error) => {
+                console.error("Error loading exercise list: ", error);
+                currentExerciseListContainer.innerHTML = `<p class="text-red-500">Failed to load list.</p>`;
+            });
+        }
+        
+        /**
+         * Saves the new list back to Firestore.
+         */
+        async function saveExerciseList(list) {
+            if (!db || !userId) return;
+            try {
+                // setDoc will overwrite the list with the new array
+                await setDoc(EXERCISE_DOC_REF(userId), { exercises: list }, { merge: false });
+            } catch (error) {
+                console.error("Error saving exercise list: ", error);
+            }
+        }
+        
+        /**
+         * Adds a new exercise from the input field.
+         */
+        function addExercise() {
+            const newEx = newExerciseInput.value.trim();
+            // Check if the exercise is already in the list (case-insensitive)
+            if (newEx && !currentExerciseList.map(e => e.toLowerCase()).includes(newEx.toLowerCase())) {
+                const newList = [...currentExerciseList, newEx];
+                newExerciseInput.value = ''; // Clear input
+                saveExerciseList(newList); // saveExerciseList will trigger onSnapshot, updating state and UI
+            } else if (newEx) {
+                // Simple feedback for duplicates
+                newExerciseInput.value = '';
+                newExerciseInput.placeholder = "Already exists!";
+                setTimeout(() => newExerciseInput.placeholder = "e.g., Bulgarian Split Squat", 1500);
+            }
+        }
+
+        /**
+         * Deletes a specific exercise from the list.
+         */
+        window.deleteExercise = function(exerciseToDelete) {
+            // Use strict comparison for deletion
+            const newList = currentExerciseList.filter(ex => ex !== exerciseToDelete);
+            saveExerciseList(newList);
+        }
+
+        /**
+         * Renders the current exercise list in the management panel.
+         */
+        function renderManagerList() {
+            listLoadingMessage.classList.add('hidden');
+            currentExerciseListContainer.innerHTML = '';
+
+            if (currentExerciseList.length === 0) {
+                currentExerciseListContainer.innerHTML = `<p class="text-gray-500 p-2 border border-gray-200 rounded-lg">Your custom list is empty. Add exercises above!</p>`;
+                return;
+            }
+
+            currentExerciseList.forEach(ex => {
+                // We use replace to safely handle single quotes in exercise names when passing to the onclick handler
+                const safeEx = ex.replace(/'/g, "\\'"); 
+                const item = document.createElement('div');
+                item.className = 'flex justify-between items-center p-2 bg-gray-100 rounded-lg border border-gray-200';
+                item.innerHTML = `
+                    <span class="text-gray-700 font-medium">${ex}</span>
+                    <button class="delete-workout-btn text-red-500 hover:text-red-700 transition duration-200 ml-4 p-1"
+                            data-id="${ex}" onclick="deleteExercise('${safeEx}')" title="Delete Exercise">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                `;
+                currentExerciseListContainer.appendChild(item);
+            });
+        }
+        
+        // Event listeners for exercise management
+        addExerciseButton.addEventListener('click', addExercise);
+        newExerciseInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addExercise();
+            }
+        });
+        
+        // --- Firestore Saving Logic (Unchanged) ---
 
         logForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -492,8 +654,6 @@
             const workoutData = {
                 exercise: exerciseName,
                 sets: sets,
-                // Superset-ready structure: a workout is a collection of sets
-                // We'll use the timestamp for sorting
                 timestamp: serverTimestamp() 
             };
 
@@ -534,7 +694,7 @@
             }
         });
 
-        // --- Firestore Reading and Deleting Logic ---
+        // --- Firestore Reading and Deleting Logic (Unchanged) ---
 
         function setupRealtimeHistory() {
             if (!db || !userId) return;
@@ -542,8 +702,6 @@
             const workoutsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'workouts');
             
             // Query: Get all workouts, ordered by timestamp descending
-            // Note: While orderBy is in use, Firestore may require an index for this.
-            // For robust use, consider sorting in-memory. For now, we use the query.
             const q = query(workoutsCollectionRef, orderBy('timestamp', 'desc'));
 
             // Real-time listener
@@ -608,19 +766,19 @@
         window.deleteWorkout = async function(docId) {
             if (!db || !userId) return;
 
-            const confirmDelete = prompt("Type 'DELETE' to confirm you want to permanently delete this workout.");
-            if (confirmDelete !== 'DELETE') return;
+            // Use a confirmation prompt instead of window.confirm
+            const userInput = prompt("To confirm deletion, type 'DELETE' below:");
+            if (userInput !== 'DELETE') return;
             
             const docRef = doc(db, 'artifacts', appId, 'users', userId, 'workouts', docId);
 
             try {
-                // Delete the document
                 await deleteDoc(docRef);
                 console.log(`Workout document ${docId} successfully deleted.`);
-                // The onSnapshot listener will automatically update the UI
             } catch (error) {
                 console.error("Error deleting document: ", error);
-                alert('Failed to delete workout. Check console for details.');
+                // Logging final error to console to comply with the strict rule against alert/confirm
+                console.error('Failed to delete workout. Please check your Firestore security rules.');
             }
         }
         
