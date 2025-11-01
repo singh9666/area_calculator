@@ -42,6 +42,7 @@ label { display:flex; align-items:center; gap:5px; }
 <div id="root"></div>
 
 <script type="text/babel">
+
 const { useState, useEffect } = React;
 
 // Firebase Setup
@@ -54,31 +55,35 @@ const firebaseConfig = {
   appId: "1:139587565969:web:90bf938d213afbc81e0230",
   measurementId: "G-5DZYYM4YN2"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// App Component
-function App(){
-  const [user,setUser] = useState(null);
-  useEffect(()=>{ auth.onAuthStateChanged(u=>setUser(u)); },[]);
+function App() {
+  const [user, setUser] = useState(null);
+  useEffect(()=>{
+    const unsubscribe = auth.onAuthStateChanged(u=>setUser(u));
+    return ()=>unsubscribe();
+  },[]);
   if(!user) return <Login />;
   return <Dashboard user={user} />;
 }
 
-// Login Component
 function Login(){
   const [email,setEmail] = useState('');
   const [password,setPassword] = useState('');
   const [mode,setMode] = useState('login');
   const [error,setError] = useState('');
-  const handleSubmit = async ()=>{
+
+  const handleSubmit = async () => {
     setError('');
-    try{
+    try {
       if(mode==='login') await auth.signInWithEmailAndPassword(email,password);
       else await auth.createUserWithEmailAndPassword(email,password);
-    }catch(e){ setError(e.message); }
+    } catch(e){ setError(e.message); }
   }
+
   return (
     <div className="container">
       <h2>{mode==='login'?'Login':'Register'}</h2>
@@ -92,10 +97,9 @@ function Login(){
         </button>
       </p>
     </div>
-  );
+  )
 }
 
-// Dashboard Component
 function Dashboard({user}){
   const [exercises,setExercises] = useState([]);
   const [newExercise,setNewExercise] = useState('');
@@ -107,35 +111,26 @@ function Dashboard({user}){
   const [weightInput,setWeightInput] = useState('');
   const [supersetInput,setSupersetInput] = useState(false);
 
-  // Load exercises
-  useEffect(()=>{
-    const fetchExercises = async ()=>{
-      const snapshot = await db.collection('exercises').where('uid','==',user.uid).get();
-      if(snapshot.empty){
-        const defaultExercises = ['Bench Press','Squat','Deadlift'];
-        const added = [];
-        for(const name of defaultExercises){
-          const doc = await db.collection('exercises').add({name, uid:user.uid});
-          added.push({id:doc.id,name});
-        }
-        setExercises(added);
-      } else setExercises(snapshot.docs.map(d=>({id:d.id,name:d.data().name})));
-    }
-    fetchExercises();
-  },[]);
+  // Load Exercises
+  const loadExercises = async () => {
+    const snapshot = await db.collection('exercises').where('uid','==',user.uid).get();
+    setExercises(snapshot.docs.map(d=>({id:d.id,name:d.data().name})));
+  }
 
-  // Load workouts
+  // Load Workouts
+  const loadWorkouts = async () => {
+    const snapshot = await db.collection('workouts').where('uid','==',user.uid).orderBy('date','desc').get();
+    setWorkouts(snapshot.docs.map(d=>({id:d.id,...d.data()})));
+  }
+
   useEffect(()=>{
-    const fetchWorkouts = async ()=>{
-      const snapshot = await db.collection('workouts').where('uid','==',user.uid).orderBy('date','desc').get();
-      setWorkouts(snapshot.docs.map(d=>({id:d.id,...d.data()})));
-    }
-    fetchWorkouts();
+    loadExercises();
+    loadWorkouts();
   },[]);
 
   // Stats
   const totalWorkouts = workouts.length;
-  const totalSets = workouts.reduce((acc,w)=>acc + w.sets.length,0);
+  const totalSets = workouts.reduce((acc,w)=>acc+w.sets.length,0);
   const heaviestLifts = {};
   workouts.forEach(w=>{
     w.sets.forEach(s=>{
@@ -143,48 +138,50 @@ function Dashboard({user}){
     })
   });
   const recentWorkouts = workouts.slice(0,5);
+  const maxWeight = Math.max(...Object.values(heaviestLifts),1);
 
-  const addExercise = async ()=>{
+  // Add Exercise
+  const handleAddExercise = async ()=>{
     if(!newExercise) return;
-    const doc = await db.collection('exercises').add({name:newExercise,uid:user.uid});
-    setExercises([...exercises,{id:doc.id,name:newExercise}]);
+    await db.collection('exercises').add({name:newExercise,uid:user.uid});
     setNewExercise('');
+    await loadExercises();
   }
 
-  const deleteExercise = async (id)=>{
+  // Delete Exercise
+  const handleDeleteExercise = async id => {
     await db.collection('exercises').doc(id).delete();
-    setExercises(exercises.filter(e=>e.id!==id));
+    await loadExercises();
   }
 
-  const addSet = ()=>{
+  // Add Set
+  const handleAddSet = ()=>{
     if(!exerciseInput || !repsInput || !weightInput) return;
     setSets([...sets,{exercise:exerciseInput,reps:repsInput,weight:weightInput,superset:supersetInput}]);
     setExerciseInput(''); setRepsInput(''); setWeightInput(''); setSupersetInput(false);
   }
 
-  const saveWorkout = async ()=>{
+  // Save Workout
+  const handleSaveWorkout = async ()=>{
     if(!selectedWorkout || sets.length===0) return;
     const date = new Date().toISOString();
     await db.collection('workouts').add({uid:user.uid,name:selectedWorkout,sets,date});
-    setWorkouts([{name:selectedWorkout,sets,date},...workouts]);
-    setSets([]); setSelectedWorkout('');
+    setSelectedWorkout(''); setSets([]);
+    await loadWorkouts();
   }
 
-  const logout = async ()=>{await auth.signOut();}
-
-  // Max weight for progress bars
-  const maxWeight = Math.max(...Object.values(heaviestLifts), 1);
+  const handleLogout = async ()=>{ await auth.signOut(); }
 
   return (
     <div>
       <header>
         <h1>Gym Workout Logger</h1>
-        <button onClick={logout}>Logout</button>
+        <button onClick={handleLogout}>Logout</button>
       </header>
 
-      {/* Stats Dashboard with progress bars */}
+      {/* Stats Dashboard */}
       <div className="container">
-        <h2>Stats Dashboard 1</h2>
+        <h2>Stats Dashboard</h2>
         <p><strong>Total Workouts:</strong> {totalWorkouts}</p>
         <p><strong>Total Sets:</strong> {totalSets}</p>
         <h4>Heaviest Lifts:</h4>
@@ -214,12 +211,12 @@ function Dashboard({user}){
         {exercises.map(e=>
           <div key={e.id} className="flex">
             <span>{e.name}</span>
-            <button style={{background:'#ff4d4d'}} onClick={()=>deleteExercise(e.id)}>Delete</button>
+            <button style={{background:'#ff4d4d'}} onClick={()=>handleDeleteExercise(e.id)}>Delete</button>
           </div>
         )}
         <div className="flex">
           <input placeholder="New Exercise" value={newExercise} onChange={e=>setNewExercise(e.target.value)}/>
-          <button onClick={addExercise}>Add Exercise</button>
+          <button onClick={handleAddExercise}>Add Exercise</button>
         </div>
       </div>
 
@@ -235,13 +232,13 @@ function Dashboard({user}){
           <input placeholder="Reps" type="number" value={repsInput} onChange={e=>setRepsInput(e.target.value)}/>
           <input placeholder="Weight (kg)" type="number" value={weightInput} onChange={e=>setWeightInput(e.target.value)}/>
           <label><input type="checkbox" checked={supersetInput} onChange={e=>setSupersetInput(e.target.checked)}/> Superset</label>
-          <button onClick={addSet}>Add Set</button>
+          <button onClick={handleAddSet}>Add Set</button>
         </div>
         {sets.length>0 && <table>
           <thead><tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr></thead>
           <tbody>{sets.map((s,i)=><tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>)}</tbody>
         </table>}
-        <button style={{background:'#4CAF50'}} onClick={saveWorkout}>Save Workout</button>
+        <button style={{background:'#4CAF50'}} onClick={handleSaveWorkout}>Save Workout</button>
       </div>
 
       {/* Workout History */}
