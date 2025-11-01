@@ -560,6 +560,121 @@
         .add-set:active, .add-exercise:active {
             transform: translateY(0);
         }
+
+        /* Previous Workout History */
+        .previous-workouts {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .previous-workouts h3 {
+            padding: 1.2rem 1.5rem;
+            background: var(--warning);
+            color: white;
+            font-size: 1.3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .previous-workouts h3 i {
+            transition: transform 0.3s;
+        }
+        
+        .previous-workouts h3.collapsed i {
+            transform: rotate(-90deg);
+        }
+        
+        .previous-workouts-content {
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .previous-workout-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .previous-workout-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .previous-workout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .previous-workout-date {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .previous-workout-name {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .previous-exercise {
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            background: white;
+            border-radius: 6px;
+            border-left: 3px solid var(--success);
+        }
+        
+        .previous-exercise:last-child {
+            margin-bottom: 0;
+        }
+        
+        .previous-exercise-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .previous-sets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .previous-set {
+            text-align: center;
+            padding: 0.4rem;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .previous-set.rep-highlight {
+            background: var(--success);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .previous-set.weight-highlight {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .no-previous-workouts {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+            font-style: italic;
+        }
         
         /* Loading Spinner */
         .spinner {
@@ -709,6 +824,10 @@
                 padding: 1rem;
             }
             
+            .previous-sets {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
             .mobile-bottom-nav {
                 display: block;
             }
@@ -741,6 +860,10 @@
             
             .auth-form {
                 padding: 1.2rem;
+            }
+            
+            .previous-sets {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
@@ -931,6 +1054,17 @@
         <section id="workout-section" class="workout-logging hidden">
             <h2>Log Your Workout</h2>
             
+            <!-- Previous Workouts Section -->
+            <div class="previous-workouts" id="previous-workouts">
+                <h3 id="previous-workouts-toggle">
+                    <span>Previous Workout History</span>
+                    <i class="fas fa-chevron-down"></i>
+                </h3>
+                <div class="previous-workouts-content hidden" id="previous-workouts-content">
+                    <div class="spinner" id="previous-workouts-spinner"></div>
+                </div>
+            </div>
+            
             <div class="workout-form">
                 <div class="form-group">
                     <label for="workout-name">Workout Name</label>
@@ -1018,6 +1152,11 @@
         const closeMenu = document.getElementById('close-menu');
         const navOverlay = document.getElementById('nav-overlay');
         
+        // Previous workouts elements
+        const previousWorkoutsToggle = document.getElementById('previous-workouts-toggle');
+        const previousWorkoutsContent = document.getElementById('previous-workouts-content');
+        const previousWorkoutsSpinner = document.getElementById('previous-workouts-spinner');
+        
         const addExerciseBtn = document.getElementById('add-exercise-btn');
         const exerciseList = document.getElementById('exercise-list');
         const exercisesContainer = document.getElementById('exercises-container');
@@ -1041,6 +1180,83 @@
             mobileNav.classList.remove('active');
             navOverlay.classList.remove('active');
             document.body.classList.remove('menu-open');
+        }
+
+        // Toggle previous workouts section
+        function togglePreviousWorkouts() {
+            previousWorkoutsContent.classList.toggle('hidden');
+            previousWorkoutsToggle.classList.toggle('collapsed');
+        }
+
+        // Load and display previous workout history
+        function loadPreviousWorkouts() {
+            if (userWorkouts.length === 0) {
+                previousWorkoutsContent.innerHTML = '<div class="no-previous-workouts">No previous workouts found. Start logging your first workout!</div>';
+                return;
+            }
+
+            // Show only the last 3 workouts to avoid clutter
+            const recentWorkouts = userWorkouts.slice(0, 3);
+            
+            let html = '';
+            
+            recentWorkouts.forEach(workout => {
+                const workoutDate = workout.date?.toDate ? workout.date.toDate() : new Date(workout.date);
+                const formattedDate = workoutDate.toLocaleDateString();
+                
+                html += `
+                    <div class="previous-workout-item">
+                        <div class="previous-workout-header">
+                            <div class="previous-workout-date">${formattedDate}</div>
+                            <div class="previous-workout-name">${workout.name}</div>
+                        </div>
+                `;
+                
+                workout.exercises.forEach(exerciseEntry => {
+                    const exercise = userExercises.find(ex => ex.id === exerciseEntry.exerciseId);
+                    if (exercise) {
+                        // Find max reps and weight for highlighting
+                        let maxReps = 0;
+                        let maxWeight = 0;
+                        
+                        exerciseEntry.sets.forEach(set => {
+                            if (set.reps > maxReps) maxReps = set.reps;
+                            if (set.weight > maxWeight) maxWeight = set.weight;
+                        });
+                        
+                        html += `
+                            <div class="previous-exercise">
+                                <div class="previous-exercise-name">${exercise.name}</div>
+                                <div class="previous-sets">
+                        `;
+                        
+                        exerciseEntry.sets.forEach((set, index) => {
+                            const isMaxReps = set.reps === maxReps && maxReps > 0;
+                            const isMaxWeight = set.weight === maxWeight && maxWeight > 0;
+                            let setClass = 'previous-set';
+                            
+                            if (isMaxReps) setClass += ' rep-highlight';
+                            else if (isMaxWeight) setClass += ' weight-highlight';
+                            
+                            html += `
+                                <div class="${setClass}">
+                                    <div>Set ${index + 1}</div>
+                                    <div>${set.reps} × ${set.weight}lbs</div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += `
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                html += `</div>`;
+            });
+            
+            previousWorkoutsContent.innerHTML = html;
         }
 
         // Update active nav item
@@ -1291,6 +1507,9 @@
             updateActiveNav('workout');
             initializeWorkoutForm();
             closeMobileMenu();
+            
+            // Load previous workouts when entering workout logging
+            loadPreviousWorkouts();
         }
 
         // Dashboard functions
@@ -1718,6 +1937,9 @@
             menuToggle.addEventListener('click', openMobileMenu);
             closeMenu.addEventListener('click', closeMobileMenu);
             navOverlay.addEventListener('click', closeMobileMenu);
+            
+            // Previous workouts toggle
+            previousWorkoutsToggle.addEventListener('click', togglePreviousWorkouts);
             
             // Exercise management event listeners
             addExerciseBtn.addEventListener('click', addNewExercise);
