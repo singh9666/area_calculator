@@ -158,6 +158,20 @@
             flex-wrap: wrap;
         }
         
+        /* Company Details Section */
+        .company-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .company-details h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
         /* Invoice Preview Styles */
         .invoice-preview {
             background: white;
@@ -305,18 +319,40 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .currency-symbol {
+            font-weight: bold;
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="app-title">
             <h1>🏠 Fitting Services Invoice Generator</h1>
-            <p>Create professional invoices for your fitting services</p>
+            <p>Create professional invoices in GBP for your fitting services</p>
         </div>
         
         <div class="main-content">
             <div class="form-section">
                 <h2 class="section-title">Invoice Details</h2>
+                
+                <div class="company-details">
+                    <h3>Your Company Details</h3>
+                    <div class="form-group">
+                        <label for="companyName">Company/Business Name</label>
+                        <input type="text" id="companyName" class="form-control" placeholder="Enter your business name">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyAddress">Company Address</label>
+                        <textarea id="companyAddress" class="form-control" rows="2" placeholder="Enter your business address"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyContact">Contact Information</label>
+                        <input type="text" id="companyContact" class="form-control" placeholder="Phone, email, etc.">
+                    </div>
+                </div>
+                
                 <form id="invoiceForm">
                     <div class="form-group">
                         <label for="customerName">Customer Name *</label>
@@ -339,8 +375,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="fittingCharges">Fitting Charges (₹) *</label>
-                        <input type="number" id="fittingCharges" class="form-control" placeholder="Enter amount in rupees" step="0.01" min="0" required>
+                        <label for="fittingCharges">Fitting Charges (<span class="currency-symbol">£</span>) *</label>
+                        <input type="number" id="fittingCharges" class="form-control" placeholder="Enter amount in GBP" step="0.01" min="0" required>
                     </div>
                     
                     <div class="form-group">
@@ -428,14 +464,39 @@
         }
 
         function generateInvoicePreview() {
+            const companyName = document.getElementById('companyName').value;
+            const companyAddress = document.getElementById('companyAddress').value;
+            const companyContact = document.getElementById('companyContact').value;
             const customerName = document.getElementById('customerName').value;
             const customerAddress = document.getElementById('customerAddress').value;
-            const invoiceDate = new Date(document.getElementById('invoiceDate').value).toLocaleDateString('en-IN');
+            const invoiceDate = new Date(document.getElementById('invoiceDate').value).toLocaleDateString('en-GB');
             const areaFitted = parseFloat(document.getElementById('areaFitted').value).toFixed(2);
             const fittingCharges = parseFloat(document.getElementById('fittingCharges').value);
             const serviceDescription = document.getElementById('serviceDescription').value || 'Flooring fitting services';
 
             const totalAmount = fittingCharges;
+            const ratePerSqm = fittingCharges / areaFitted;
+
+            // Build company details section
+            let companyDetailsHTML = '';
+            if (companyName || companyAddress || companyContact) {
+                companyDetailsHTML = `
+                    <div class="invoice-from">
+                        <div class="detail-label">From:</div>
+                        ${companyName ? `<div class="detail-value"><strong>${companyName}</strong></div>` : ''}
+                        ${companyAddress ? `<div class="detail-value">${companyAddress.replace(/\n/g, '<br>')}</div>` : ''}
+                        ${companyContact ? `<div class="detail-value">${companyContact}</div>` : ''}
+                    </div>
+                `;
+            } else {
+                companyDetailsHTML = `
+                    <div class="invoice-from">
+                        <div class="detail-label">From:</div>
+                        <div class="detail-value"><em>Your Company Details</em></div>
+                        <div class="detail-value"><em>Add your information in the form</em></div>
+                    </div>
+                `;
+            }
 
             const invoiceHTML = `
                 <div class="invoice-header">
@@ -444,14 +505,7 @@
                 </div>
                 
                 <div class="invoice-details">
-                    <div class="invoice-from">
-                        <div class="detail-label">From:</div>
-                        <div class="detail-value">Your Fitting Company</div>
-                        <div class="detail-value">123 Business Street</div>
-                        <div class="detail-value">City, State 12345</div>
-                        <div class="detail-value">Phone: (555) 123-4567</div>
-                        <div class="detail-value">Email: info@fittingcompany.com</div>
-                    </div>
+                    ${companyDetailsHTML}
                     
                     <div class="invoice-to">
                         <div class="detail-label">Bill To:</div>
@@ -479,28 +533,28 @@
                             <tr>
                                 <th>Description</th>
                                 <th>Area (m²)</th>
-                                <th>Rate (₹/m²)</th>
-                                <th>Amount (₹)</th>
+                                <th>Rate (£/m²)</th>
+                                <th>Amount (£)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>${serviceDescription}</td>
                                 <td>${areaFitted}</td>
-                                <td>₹${(fittingCharges / areaFitted).toFixed(2)}</td>
-                                <td>₹${fittingCharges.toFixed(2)}</td>
+                                <td>£${ratePerSqm.toFixed(2)}</td>
+                                <td>£${fittingCharges.toFixed(2)}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 
                 <div class="invoice-total">
-                    Total Amount: ₹${totalAmount.toFixed(2)}
+                    Total Amount: £${totalAmount.toFixed(2)}
                 </div>
                 
                 <div class="invoice-footer">
                     <p>Thank you for your business! Payment due within 15 days.</p>
-                    <p>For any questions, please contact us at (555) 123-4567</p>
+                    ${companyContact ? `<p>For any questions, please contact: ${companyContact}</p>` : ''}
                 </div>
             `;
 
@@ -569,11 +623,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Uncomment the lines below to pre-fill with sample data for testing
             /*
-            document.getElementById('customerName').value = 'John Smith';
-            document.getElementById('customerAddress').value = '123 Main Street\nApartment 4B\nMumbai, Maharashtra 400001';
-            document.getElementById('areaFitted').value = '25.5';
-            document.getElementById('fittingCharges').value = '12750';
-            document.getElementById('serviceDescription').value = 'Premium wooden flooring installation with underlay';
+            document.getElementById('companyName').value = 'Quality Fittings Ltd';
+            document.getElementById('companyAddress').value = '123 Business Park\nLondon, UK';
+            document.getElementById('companyContact').value = 'Phone: 020 7123 4567 | Email: info@qualityfittings.co.uk';
+            document.getElementById('customerName').value = 'Sarah Johnson';
+            document.getElementById('customerAddress').value = '45 Park Avenue\nLondon W1 2BH\nUnited Kingdom';
+            document.getElementById('areaFitted').value = '35.75';
+            document.getElementById('fittingCharges').value = '1787.50';
+            document.getElementById('serviceDescription').value = 'Premium wooden flooring installation with underlay and finishing';
             */
         });
     </script>
