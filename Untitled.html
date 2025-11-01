@@ -1,46 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gym Workout Logger</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Workout Logger</title>
 
-  <!-- React CDN -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script crossorigin src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+<!-- React CDN -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script crossorigin src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
-  <!-- Firebase UMD (v9 compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- Firebase UMD -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fdf6e3; color: #333; }
-    header { background: #ffb347; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { margin: 0; font-size: 24px; color: #fff; }
-    button { cursor: pointer; padding: 5px 10px; margin: 5px; border: none; border-radius: 4px; background: #ff7e5f; color: white; }
-    input, select { padding: 5px; margin: 5px 0; border-radius: 4px; border: 1px solid #ccc; width: 100%; }
-    .container { max-width: 900px; margin: 20px auto; padding: 10px; background: #fff9f0; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h2 { margin-top: 0; }
-    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    table, th, td { border: 1px solid #ccc; }
-    th, td { padding: 8px; text-align: left; }
-    .exercise-list, .workout-list { margin-bottom: 20px; }
-    .flex { display: flex; flex-wrap: wrap; gap: 10px; }
-    .flex input { flex: 1; }
-    label { display: flex; align-items: center; gap: 5px; }
-  </style>
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#fdf6e3; color:#333; }
+header { background:#ffb347; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; }
+header h1 { margin:0; font-size:24px; color:#fff; }
+button { cursor:pointer; padding:5px 10px; margin:5px; border:none; border-radius:4px; background:#ff7e5f; color:white; }
+input, select { padding:5px; margin:5px 0; border-radius:4px; border:1px solid #ccc; width:100%; }
+.container { max-width:900px; margin:20px auto; padding:10px; background:#fff9f0; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+h2 { margin-top:0; }
+table { width:100%; border-collapse:collapse; margin:10px 0; }
+table, th, td { border:1px solid #ccc; }
+th, td { padding:8px; text-align:left; }
+.exercise-list, .workout-list { margin-bottom:20px; }
+.flex { display:flex; flex-wrap:wrap; gap:10px; }
+.flex input, .flex select { flex:1; }
+label { display:flex; align-items:center; gap:5px; }
+@media(max-width:600px){
+  .flex { flex-direction:column; }
+  button { width:100%; }
+}
+</style>
 </head>
 <body>
-  <div id="root"></div>
+<div id="root"></div>
 
-  <script type="text/babel">
+<script type="text/babel">
 const { useState, useEffect } = React;
 
-////////////////////////
 // Firebase Setup
-////////////////////////
 const firebaseConfig = {
   apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
   authDomain: "gymlog-3ef3b.firebaseapp.com",
@@ -55,50 +57,43 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-////////////////////////
 // App Component
-////////////////////////
-function App() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    auth.onAuthStateChanged(u => {
-      setUser(u);
-    });
-  }, []);
-
-  if (!user) return <Login />;
+function App(){
+  const [user,setUser] = useState(null);
+  useEffect(()=>{
+    auth.onAuthStateChanged(u=>setUser(u));
+  },[]);
+  if(!user) return <Login />;
   return <Dashboard user={user} />;
 }
 
-////////////////////////
 // Login Component
-////////////////////////
-function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [mode, setMode] = useState('login'); // login or register
-  const [error, setError] = useState('');
+function Login(){
+  const [email,setEmail] = useState('');
+  const [password,setPassword] = useState('');
+  const [mode,setMode] = useState('login');
+  const [error,setError] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = async ()=>{
     setError('');
-    if (mode === 'login') {
-      auth.signInWithEmailAndPassword(email, password).catch(e => setError(e.message));
-    } else {
-      auth.createUserWithEmailAndPassword(email, password).catch(e => setError(e.message));
-    }
+    try{
+      if(mode==='login'){
+        await auth.signInWithEmailAndPassword(email,password);
+      } else {
+        await auth.createUserWithEmailAndPassword(email,password);
+      }
+    }catch(e){ setError(e.message); }
   }
 
   return (
     <div className="container">
-      <h2>{mode === 'login' ? 'Login' : 'Register'}</h2>
-      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button onClick={handleSubmit}>{mode === 'login' ? 'Login' : 'Register'}</button>
+      <h2>{mode==='login'?'Login':'Register'}</h2>
+      <input type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} />
+      <button onClick={handleSubmit}>{mode==='login'?'Login':'Register'}</button>
       {error && <p style={{color:'red'}}>{error}</p>}
-      <p>
-        {mode==='login' ? 'No account?' : 'Already have account?'} 
-        <button onClick={()=>setMode(mode==='login'?'register':'login')} style={{background:'#ffa500'}}>
+      <p>{mode==='login'?'No account?':'Already have account?'}
+        <button style={{background:'#ffa500'}} onClick={()=>setMode(mode==='login'?'register':'login')}>
           {mode==='login'?'Register':'Login'}
         </button>
       </p>
@@ -106,45 +101,45 @@ function Login() {
   );
 }
 
-////////////////////////
 // Dashboard Component
-////////////////////////
-function Dashboard({ user }) {
-  const [exercises, setExercises] = useState([]);
-  const [newExercise, setNewExercise] = useState('');
-  const [workouts, setWorkouts] = useState([]);
-  const [selectedWorkout, setSelectedWorkout] = useState('');
-  const [sets, setSets] = useState([]);
-  const [exerciseInput, setExerciseInput] = useState('');
-  const [repsInput, setRepsInput] = useState('');
-  const [weightInput, setWeightInput] = useState('');
-  const [supersetInput, setSupersetInput] = useState(false);
+function Dashboard({user}){
+  const [exercises,setExercises] = useState([]);
+  const [newExercise,setNewExercise] = useState('');
+  const [workouts,setWorkouts] = useState([]);
+  const [selectedWorkout,setSelectedWorkout] = useState('');
+  const [sets,setSets] = useState([]);
+  const [exerciseInput,setExerciseInput] = useState('');
+  const [repsInput,setRepsInput] = useState('');
+  const [weightInput,setWeightInput] = useState('');
+  const [supersetInput,setSupersetInput] = useState(false);
 
   // Load exercises
-  useEffect(() => {
-    const fetchExercises = async () => {
+  useEffect(()=>{
+    const fetchExercises = async ()=>{
       const snapshot = await db.collection('exercises').where('uid','==',user.uid).get();
-      if (snapshot.empty) {
+      if(snapshot.empty){
         const defaultExercises = ['Bench Press','Squat','Deadlift'];
-        defaultExercises.forEach(async name => {
-          await db.collection('exercises').add({name, uid:user.uid});
-        });
-        setExercises(defaultExercises.map((name,i)=>({id:i,name})));
+        const added = [];
+        for(const name of defaultExercises){
+          const doc = await db.collection('exercises').add({name, uid:user.uid});
+          added.push({id:doc.id,name});
+        }
+        setExercises(added);
       } else {
-        setExercises(snapshot.docs.map(doc=>({id:doc.id,name:doc.data().name})));
+        setExercises(snapshot.docs.map(d=>({id:d.id,name:d.data().name})));
       }
     }
     fetchExercises();
-  }, []);
+  },[]);
 
   // Load workouts
-  useEffect(() => {
-    const fetchWorkouts = async () => {
+  useEffect(()=>{
+    const fetchWorkouts = async ()=>{
       const snapshot = await db.collection('workouts').where('uid','==',user.uid).orderBy('date','desc').get();
-      setWorkouts(snapshot.docs.map(doc=>({id:doc.id, ...doc.data()})));
+      setWorkouts(snapshot.docs.map(d=>({id:d.id,...d.data()})));
     }
     fetchWorkouts();
-  }, []);
+  },[]);
 
   // Stats
   const totalWorkouts = workouts.length;
@@ -152,42 +147,38 @@ function Dashboard({ user }) {
   const heaviestLifts = {};
   workouts.forEach(w=>{
     w.sets.forEach(s=>{
-      if(!heaviestLifts[s.exercise] || s.weight > heaviestLifts[s.exercise]) {
-        heaviestLifts[s.exercise] = s.weight;
-      }
+      if(!heaviestLifts[s.exercise] || s.weight>heaviestLifts[s.exercise]) heaviestLifts[s.exercise]=s.weight;
     })
   });
   const recentWorkouts = workouts.slice(0,5);
 
-  const addExercise = async () => {
+  const addExercise = async ()=>{
     if(!newExercise) return;
-    const docRef = await db.collection('exercises').add({name:newExercise, uid:user.uid});
-    setExercises([...exercises,{id:docRef.id,name:newExercise}]);
+    const doc = await db.collection('exercises').add({name:newExercise,uid:user.uid});
+    setExercises([...exercises,{id:doc.id,name:newExercise}]);
     setNewExercise('');
   }
 
-  const deleteExercise = async (id) => {
+  const deleteExercise = async (id)=>{
     await db.collection('exercises').doc(id).delete();
     setExercises(exercises.filter(e=>e.id!==id));
   }
 
-  const addSet = () => {
+  const addSet = ()=>{
     if(!exerciseInput || !repsInput || !weightInput) return;
     setSets([...sets,{exercise:exerciseInput,reps:repsInput,weight:weightInput,superset:supersetInput}]);
     setExerciseInput(''); setRepsInput(''); setWeightInput(''); setSupersetInput(false);
   }
 
-  const saveWorkout = async () => {
+  const saveWorkout = async ()=>{
     if(!selectedWorkout || sets.length===0) return;
     const date = new Date().toISOString();
-    await db.collection('workouts').add({uid:user.uid, name:selectedWorkout, sets, date});
-    setWorkouts([{name:selectedWorkout, sets, date}, ...workouts]);
+    await db.collection('workouts').add({uid:user.uid,name:selectedWorkout,sets,date});
+    setWorkouts([{name:selectedWorkout,sets,date},...workouts]);
     setSets([]); setSelectedWorkout('');
   }
 
-  const logout = async () => {
-    await auth.signOut();
-  }
+  const logout = async ()=>{await auth.signOut();}
 
   return (
     <div>
@@ -203,93 +194,67 @@ function Dashboard({ user }) {
         <p><strong>Total Sets:</strong> {totalSets}</p>
         <h4>Heaviest Lifts:</h4>
         {Object.keys(heaviestLifts).length===0 && <p>No lifts yet.</p>}
-        {Object.keys(heaviestLifts).map(ex => (
-          <p key={ex}>{ex}: {heaviestLifts[ex]} kg</p>
-        ))}
+        {Object.keys(heaviestLifts).map(ex=><p key={ex}>{ex}: {heaviestLifts[ex]} kg</p>)}
         <h4>Recent Workouts:</h4>
         {recentWorkouts.length===0 && <p>No recent workouts.</p>}
-        <ul>
-          {recentWorkouts.map(w => (
-            <li key={w.id || w.date}>{w.name} - {new Date(w.date).toLocaleDateString()}</li>
-          ))}
-        </ul>
+        <ul>{recentWorkouts.map(w=><li key={w.id||w.date}>{w.name} - {new Date(w.date).toLocaleDateString()}</li>)}</ul>
       </div>
 
-      {/* Exercises Section */}
+      {/* Exercises */}
       <div className="container">
         <h2>Exercises</h2>
-        <div className="exercise-list">
-          {exercises.map(e=>(
-            <div key={e.id} className="flex">
-              <span>{e.name}</span>
-              <button onClick={()=>deleteExercise(e.id)} style={{background:'#ff4d4d'}}>Delete</button>
-            </div>
-          ))}
-        </div>
+        {exercises.map(e=>
+          <div key={e.id} className="flex">
+            <span>{e.name}</span>
+            <button style={{background:'#ff4d4d'}} onClick={()=>deleteExercise(e.id)}>Delete</button>
+          </div>
+        )}
         <div className="flex">
-          <input placeholder="New Exercise" value={newExercise} onChange={e=>setNewExercise(e.target.value)} />
+          <input placeholder="New Exercise" value={newExercise} onChange={e=>setNewExercise(e.target.value)}/>
           <button onClick={addExercise}>Add Exercise</button>
         </div>
       </div>
 
-      {/* Workout Logging Section */}
+      {/* Workout Logging */}
       <div className="container">
         <h2>Log Workout</h2>
-        <input placeholder="Workout Name (Push/Pull/Legs)" value={selectedWorkout} onChange={e=>setSelectedWorkout(e.target.value)} />
+        <input placeholder="Workout Name (Push/Pull/Legs)" value={selectedWorkout} onChange={e=>setSelectedWorkout(e.target.value)}/>
         <div className="flex">
           <select value={exerciseInput} onChange={e=>setExerciseInput(e.target.value)}>
             <option value="">Select Exercise</option>
             {exercises.map(e=><option key={e.id} value={e.name}>{e.name}</option>)}
           </select>
-          <input placeholder="Reps" type="number" value={repsInput} onChange={e=>setRepsInput(e.target.value)} />
-          <input placeholder="Weight (kg)" type="number" value={weightInput} onChange={e=>setWeightInput(e.target.value)} />
-          <label>
-            <input type="checkbox" checked={supersetInput} onChange={e=>setSupersetInput(e.target.checked)} />
-            Superset
-          </label>
+          <input placeholder="Reps" type="number" value={repsInput} onChange={e=>setRepsInput(e.target.value)}/>
+          <input placeholder="Weight (kg)" type="number" value={weightInput} onChange={e=>setWeightInput(e.target.value)}/>
+          <label><input type="checkbox" checked={supersetInput} onChange={e=>setSupersetInput(e.target.checked)}/> Superset</label>
           <button onClick={addSet}>Add Set</button>
         </div>
-        {sets.length>0 && (
-          <table>
-            <thead>
-              <tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr>
-            </thead>
-            <tbody>
-              {sets.map((s,i)=>(
-                <tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <button onClick={saveWorkout} style={{background:'#4CAF50'}}>Save Workout</button>
+        {sets.length>0 && <table>
+          <thead><tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr></thead>
+          <tbody>{sets.map((s,i)=><tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>)}</tbody>
+        </table>}
+        <button style={{background:'#4CAF50'}} onClick={saveWorkout}>Save Workout</button>
       </div>
 
       {/* Workout History */}
       <div className="container">
         <h2>Workout History</h2>
         {workouts.length===0 && <p>No workouts logged yet.</p>}
-        {workouts.map(w=>(
-          <div key={w.id || w.date} style={{border:'1px solid #ccc', margin:'5px 0', padding:'5px', borderRadius:'4px'}}>
+        {workouts.map(w=>
+          <div key={w.id||w.date} style={{border:'1px solid #ccc', margin:'5px 0', padding:'5px', borderRadius:'4px'}}>
             <strong>{w.name}</strong> - {new Date(w.date).toLocaleString()}
             <table>
-              <thead>
-                <tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr>
-              </thead>
-              <tbody>
-                {w.sets.map((s,i)=>(
-                  <tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>
-                ))}
-              </tbody>
+              <thead><tr><th>Exercise</th><th>Reps</th><th>Weight</th><th>Superset</th></tr></thead>
+              <tbody>{w.sets.map((s,i)=><tr key={i}><td>{s.exercise}</td><td>{s.reps}</td><td>{s.weight}</td><td>{s.superset?'Yes':'No'}</td></tr>)}</tbody>
             </table>
           </div>
-        ))}
+        )}
       </div>
-
     </div>
   )
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
-  </script>
+</script>
 </body>
 </html>
