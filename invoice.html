@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitting Services Invoice Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .app-title {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .app-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .app-title p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-section, .preview-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .section-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+        
+        .btn-danger {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Invoice Preview Styles */
+        .invoice-preview {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 2rem;
+            min-height: 400px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--secondary);
+        }
+        
+        .invoice-title {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .invoice-subtitle {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .invoice-from, .invoice-to {
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .detail-value {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .invoice-items {
+            margin-bottom: 2rem;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .items-table th {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .items-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .invoice-total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary);
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 8px;
+        }
+        
+        .invoice-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e1e8ed;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .empty-preview {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 3rem;
+        }
+        
+        .empty-preview i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.error {
+            background: var(--accent);
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-title">
+            <h1>🏠 Fitting Services Invoice Generator</h1>
+            <p>Create professional invoices for your fitting services</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="form-section">
+                <h2 class="section-title">Invoice Details</h2>
+                <form id="invoiceForm">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name *</label>
+                        <input type="text" id="customerName" class="form-control" placeholder="Enter customer full name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customerAddress">Address *</label>
+                        <textarea id="customerAddress" class="form-control" rows="3" placeholder="Enter complete address" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="invoiceDate">Date *</label>
+                        <input type="date" id="invoiceDate" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="areaFitted">Area Fitted (m²) *</label>
+                        <input type="number" id="areaFitted" class="form-control" placeholder="Enter area in square meters" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fittingCharges">Fitting Charges (₹) *</label>
+                        <input type="number" id="fittingCharges" class="form-control" placeholder="Enter amount in rupees" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="serviceDescription">Service Description</label>
+                        <textarea id="serviceDescription" class="form-control" rows="2" placeholder="Brief description of fitting services provided">Flooring fitting services</textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="generatePreview">
+                            <i class="fas fa-eye"></i> Preview Invoice
+                        </button>
+                        <button type="button" class="btn btn-success" id="generatePDF">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </button>
+                        <button type="button" class="btn btn-danger" id="resetForm">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="section-title">Invoice Preview</h2>
+                <div class="invoice-preview" id="invoicePreview">
+                    <div class="empty-preview">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No Invoice Generated</h3>
+                        <p>Fill out the form and click "Preview Invoice" to see your invoice here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Initialize current date
+        document.getElementById('invoiceDate').valueAsDate = new Date();
+
+        // Generate Preview
+        document.getElementById('generatePreview').addEventListener('click', function() {
+            if (!validateForm()) return;
+            generateInvoicePreview();
+        });
+
+        // Generate PDF
+        document.getElementById('generatePDF').addEventListener('click', function() {
+            if (!validateForm()) return;
+            generatePDF();
+        });
+
+        // Reset Form
+        document.getElementById('resetForm').addEventListener('click', function() {
+            document.getElementById('invoiceForm').reset();
+            document.getElementById('invoiceDate').valueAsDate = new Date();
+            document.getElementById('invoicePreview').innerHTML = `
+                <div class="empty-preview">
+                    <i class="fas fa-receipt"></i>
+                    <h3>No Invoice Generated</h3>
+                    <p>Fill out the form and click "Preview Invoice" to see your invoice here</p>
+                </div>
+            `;
+            showToast('Form reset successfully!', 'success');
+        });
+
+        function validateForm() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerAddress = document.getElementById('customerAddress').value.trim();
+            const invoiceDate = document.getElementById('invoiceDate').value;
+            const areaFitted = document.getElementById('areaFitted').value;
+            const fittingCharges = document.getElementById('fittingCharges').value;
+
+            if (!customerName || !customerAddress || !invoiceDate || !areaFitted || !fittingCharges) {
+                showToast('Please fill in all required fields!', 'error');
+                return false;
+            }
+
+            if (parseFloat(areaFitted) <= 0 || parseFloat(fittingCharges) <= 0) {
+                showToast('Area and charges must be greater than zero!', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        function generateInvoicePreview() {
+            const customerName = document.getElementById('customerName').value;
+            const customerAddress = document.getElementById('customerAddress').value;
+            const invoiceDate = new Date(document.getElementById('invoiceDate').value).toLocaleDateString('en-IN');
+            const areaFitted = parseFloat(document.getElementById('areaFitted').value).toFixed(2);
+            const fittingCharges = parseFloat(document.getElementById('fittingCharges').value);
+            const serviceDescription = document.getElementById('serviceDescription').value || 'Flooring fitting services';
+
+            const totalAmount = fittingCharges;
+
+            const invoiceHTML = `
+                <div class="invoice-header">
+                    <h1 class="invoice-title">INVOICE</h1>
+                    <p class="invoice-subtitle">Professional Fitting Services</p>
+                </div>
+                
+                <div class="invoice-details">
+                    <div class="invoice-from">
+                        <div class="detail-label">From:</div>
+                        <div class="detail-value">Your Fitting Company</div>
+                        <div class="detail-value">123 Business Street</div>
+                        <div class="detail-value">City, State 12345</div>
+                        <div class="detail-value">Phone: (555) 123-4567</div>
+                        <div class="detail-value">Email: info@fittingcompany.com</div>
+                    </div>
+                    
+                    <div class="invoice-to">
+                        <div class="detail-label">Bill To:</div>
+                        <div class="detail-value"><strong>${customerName}</strong></div>
+                        <div class="detail-value">${customerAddress.replace(/\n/g, '<br>')}</div>
+                    </div>
+                </div>
+                
+                <div class="invoice-meta">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                        <div>
+                            <div class="detail-label">Invoice Date:</div>
+                            <div class="detail-value">${invoiceDate}</div>
+                        </div>
+                        <div>
+                            <div class="detail-label">Invoice #</div>
+                            <div class="detail-value">INV-${Date.now().toString().slice(-6)}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="invoice-items">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Area (m²)</th>
+                                <th>Rate (₹/m²)</th>
+                                <th>Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>${serviceDescription}</td>
+                                <td>${areaFitted}</td>
+                                <td>₹${(fittingCharges / areaFitted).toFixed(2)}</td>
+                                <td>₹${fittingCharges.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="invoice-total">
+                    Total Amount: ₹${totalAmount.toFixed(2)}
+                </div>
+                
+                <div class="invoice-footer">
+                    <p>Thank you for your business! Payment due within 15 days.</p>
+                    <p>For any questions, please contact us at (555) 123-4567</p>
+                </div>
+            `;
+
+            document.getElementById('invoicePreview').innerHTML = invoiceHTML;
+            showToast('Invoice preview generated successfully!', 'success');
+        }
+
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const previewElement = document.getElementById('invoicePreview');
+            
+            // Show loading state
+            const generateBtn = document.getElementById('generatePDF');
+            const originalText = generateBtn.innerHTML;
+            generateBtn.innerHTML = '<span class="spinner"></span>Generating PDF...';
+            generateBtn.disabled = true;
+
+            try {
+                // Capture the invoice preview as an image
+                const canvas = await html2canvas(previewElement, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Create PDF
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                // Add background
+                pdf.setFillColor(245, 249, 255);
+                pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+                
+                // Add invoice content
+                pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth - 20, pdfHeight - 20);
+                
+                // Save PDF
+                const customerName = document.getElementById('customerName').value.replace(/\s+/g, '_');
+                pdf.save(`Invoice_${customerName}_${new Date().toISOString().slice(0, 10)}.pdf`);
+                
+                showToast('PDF downloaded successfully!', 'success');
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showToast('Error generating PDF. Please try again.', 'error');
+            } finally {
+                // Restore button state
+                generateBtn.innerHTML = originalText;
+                generateBtn.disabled = false;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Add some sample data for testing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Uncomment the lines below to pre-fill with sample data for testing
+            /*
+            document.getElementById('customerName').value = 'John Smith';
+            document.getElementById('customerAddress').value = '123 Main Street\nApartment 4B\nMumbai, Maharashtra 400001';
+            document.getElementById('areaFitted').value = '25.5';
+            document.getElementById('fittingCharges').value = '12750';
+            document.getElementById('serviceDescription').value = 'Premium wooden flooring installation with underlay';
+            */
+        });
+    </script>
+
+    <!-- Font Awesome for icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</body>
+</html>
