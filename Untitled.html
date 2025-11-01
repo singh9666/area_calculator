@@ -1,32 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gym Workout Logger</title>
+
   <!-- React CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script crossorigin src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-  <!-- Firebase CDN -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-    window.firebaseApp = initializeApp({
-      apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
-      authDomain: "gymlog-3ef3b.firebaseapp.com",
-      projectId: "gymlog-3ef3b",
-      storageBucket: "gymlog-3ef3b.firebasestorage.app",
-      messagingSenderId: "139587565969",
-      appId: "1:139587565969:web:90bf938d213afbc81e0230",
-      measurementId: "G-5DZYYM4YN2"
-    });
+  <!-- Firebase UMD (v9 compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    window.auth = getAuth(window.firebaseApp);
-    window.db = getFirestore(window.firebaseApp);
-  </script>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #fdf6e3; color: #333; }
     header { background: #ffb347; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -41,72 +29,86 @@
     .exercise-list, .workout-list { margin-bottom: 20px; }
     .flex { display: flex; flex-wrap: wrap; gap: 10px; }
     .flex input { flex: 1; }
+    label { display: flex; align-items: center; gap: 5px; }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel">
-
 const { useState, useEffect } = React;
 
+////////////////////////
+// Firebase Setup
+////////////////////////
+const firebaseConfig = {
+  apiKey: "AIzaSyBuFnHHyghKrq0cift2_DTjpoXNWo9Dwqw",
+  authDomain: "gymlog-3ef3b.firebaseapp.com",
+  projectId: "gymlog-3ef3b",
+  storageBucket: "gymlog-3ef3b.firebasestorage.app",
+  messagingSenderId: "139587565969",
+  appId: "1:139587565969:web:90bf938d213afbc81e0230",
+  measurementId: "G-5DZYYM4YN2"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+////////////////////////
+// App Component
+////////////////////////
 function App() {
   const [user, setUser] = useState(null);
-  const [view, setView] = useState('login');
 
   useEffect(() => {
-    onAuthStateChanged(auth, (u) => {
-      if(u) {
-        setUser(u);
-        setView('dashboard');
-      } else {
-        setUser(null);
-        setView('login');
-      }
+    auth.onAuthStateChanged(u => {
+      setUser(u);
     });
   }, []);
 
-  if(!user) {
-    return <Login setView={setView} />;
-  }
-
+  if (!user) return <Login />;
   return <Dashboard user={user} />;
 }
 
-function Login({ setView }) {
+////////////////////////
+// Login Component
+////////////////////////
+function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState('login'); // login or register
   const [error, setError] = useState('');
 
-  const handleSubmit = async () => {
-    try {
-      setError('');
-      if(mode === 'login') {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
-      }
-    } catch(e) {
-      setError(e.message);
+  const handleSubmit = () => {
+    setError('');
+    if (mode === 'login') {
+      auth.signInWithEmailAndPassword(email, password).catch(e => setError(e.message));
+    } else {
+      auth.createUserWithEmailAndPassword(email, password).catch(e => setError(e.message));
     }
   }
 
   return (
     <div className="container">
       <h2>{mode === 'login' ? 'Login' : 'Register'}</h2>
-      <input type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} />
+      <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
       <button onClick={handleSubmit}>{mode === 'login' ? 'Login' : 'Register'}</button>
       {error && <p style={{color:'red'}}>{error}</p>}
       <p>
         {mode==='login' ? 'No account?' : 'Already have account?'} 
-        <button onClick={()=>setMode(mode==='login'?'register':'login')} style={{background:'#ffa500'}}>{mode==='login'?'Register':'Login'}</button>
+        <button onClick={()=>setMode(mode==='login'?'register':'login')} style={{background:'#ffa500'}}>
+          {mode==='login'?'Register':'Login'}
+        </button>
       </p>
     </div>
   );
 }
 
+////////////////////////
+// Dashboard Component
+////////////////////////
 function Dashboard({ user }) {
   const [exercises, setExercises] = useState([]);
   const [newExercise, setNewExercise] = useState('');
@@ -118,44 +120,54 @@ function Dashboard({ user }) {
   const [weightInput, setWeightInput] = useState('');
   const [supersetInput, setSupersetInput] = useState(false);
 
-  // Load exercises from Firestore
-  useEffect(()=>{
+  // Load exercises
+  useEffect(() => {
     const fetchExercises = async () => {
-      const q = query(collection(db, 'exercises'), where('uid','==',user.uid));
-      const snapshot = await getDocs(q);
-      if(snapshot.empty) {
-        // Add default exercises
+      const snapshot = await db.collection('exercises').where('uid','==',user.uid).get();
+      if (snapshot.empty) {
         const defaultExercises = ['Bench Press','Squat','Deadlift'];
-        defaultExercises.forEach(async ex => {
-          await addDoc(collection(db,'exercises'),{name:ex, uid:user.uid});
+        defaultExercises.forEach(async name => {
+          await db.collection('exercises').add({name, uid:user.uid});
         });
         setExercises(defaultExercises.map((name,i)=>({id:i,name})));
       } else {
-        setExercises(snapshot.docs.map(doc=>({id:doc.id, name:doc.data().name})));
+        setExercises(snapshot.docs.map(doc=>({id:doc.id,name:doc.data().name})));
       }
     }
     fetchExercises();
-  },[]);
+  }, []);
 
-  // Load workouts from Firestore
-  useEffect(()=>{
+  // Load workouts
+  useEffect(() => {
     const fetchWorkouts = async () => {
-      const q = query(collection(db,'workouts'), where('uid','==',user.uid), orderBy('date','desc'));
-      const snapshot = await getDocs(q);
+      const snapshot = await db.collection('workouts').where('uid','==',user.uid).orderBy('date','desc').get();
       setWorkouts(snapshot.docs.map(doc=>({id:doc.id, ...doc.data()})));
     }
     fetchWorkouts();
-  },[]);
+  }, []);
+
+  // Stats
+  const totalWorkouts = workouts.length;
+  const totalSets = workouts.reduce((acc,w)=>acc + w.sets.length,0);
+  const heaviestLifts = {};
+  workouts.forEach(w=>{
+    w.sets.forEach(s=>{
+      if(!heaviestLifts[s.exercise] || s.weight > heaviestLifts[s.exercise]) {
+        heaviestLifts[s.exercise] = s.weight;
+      }
+    })
+  });
+  const recentWorkouts = workouts.slice(0,5);
 
   const addExercise = async () => {
     if(!newExercise) return;
-    const docRef = await addDoc(collection(db,'exercises'), {name:newExercise, uid:user.uid});
+    const docRef = await db.collection('exercises').add({name:newExercise, uid:user.uid});
     setExercises([...exercises,{id:docRef.id,name:newExercise}]);
     setNewExercise('');
   }
 
   const deleteExercise = async (id) => {
-    await deleteDoc(doc(db,'exercises',id));
+    await db.collection('exercises').doc(id).delete();
     setExercises(exercises.filter(e=>e.id!==id));
   }
 
@@ -168,13 +180,13 @@ function Dashboard({ user }) {
   const saveWorkout = async () => {
     if(!selectedWorkout || sets.length===0) return;
     const date = new Date().toISOString();
-    await addDoc(collection(db,'workouts'),{uid:user.uid, name:selectedWorkout, sets, date});
+    await db.collection('workouts').add({uid:user.uid, name:selectedWorkout, sets, date});
     setWorkouts([{name:selectedWorkout, sets, date}, ...workouts]);
     setSets([]); setSelectedWorkout('');
   }
 
   const logout = async () => {
-    await signOut(auth);
+    await auth.signOut();
   }
 
   return (
@@ -183,6 +195,27 @@ function Dashboard({ user }) {
         <h1>Gym Workout Logger</h1>
         <button onClick={logout}>Logout</button>
       </header>
+
+      {/* Stats Dashboard */}
+      <div className="container">
+        <h2>Stats Dashboard</h2>
+        <p><strong>Total Workouts:</strong> {totalWorkouts}</p>
+        <p><strong>Total Sets:</strong> {totalSets}</p>
+        <h4>Heaviest Lifts:</h4>
+        {Object.keys(heaviestLifts).length===0 && <p>No lifts yet.</p>}
+        {Object.keys(heaviestLifts).map(ex => (
+          <p key={ex}>{ex}: {heaviestLifts[ex]} kg</p>
+        ))}
+        <h4>Recent Workouts:</h4>
+        {recentWorkouts.length===0 && <p>No recent workouts.</p>}
+        <ul>
+          {recentWorkouts.map(w => (
+            <li key={w.id || w.date}>{w.name} - {new Date(w.date).toLocaleDateString()}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Exercises Section */}
       <div className="container">
         <h2>Exercises</h2>
         <div className="exercise-list">
@@ -199,6 +232,7 @@ function Dashboard({ user }) {
         </div>
       </div>
 
+      {/* Workout Logging Section */}
       <div className="container">
         <h2>Log Workout</h2>
         <input placeholder="Workout Name (Push/Pull/Legs)" value={selectedWorkout} onChange={e=>setSelectedWorkout(e.target.value)} />
@@ -230,6 +264,7 @@ function Dashboard({ user }) {
         <button onClick={saveWorkout} style={{background:'#4CAF50'}}>Save Workout</button>
       </div>
 
+      {/* Workout History */}
       <div className="container">
         <h2>Workout History</h2>
         {workouts.length===0 && <p>No workouts logged yet.</p>}
@@ -249,6 +284,7 @@ function Dashboard({ user }) {
           </div>
         ))}
       </div>
+
     </div>
   )
 }
