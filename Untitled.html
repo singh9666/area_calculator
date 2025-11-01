@@ -273,7 +273,7 @@
             });
         }
         
-        // --- Button Validation Logic (No changes needed, kept for completeness) ---
+        // --- Button Validation Logic ---
 
         function checkFormValidity() {
             const exercise = document.getElementById('exercise').value.trim();
@@ -308,11 +308,8 @@
 
         function attachValidationListeners() {
             document.getElementById('exercise').addEventListener('input', updateLogButtonState);
-            // NOTE: setSetsContainer is an undeclared variable, assuming you meant setsContainer for event delegation
-            // Fixing this logic slightly as event delegation is complex with innerHTML changes.
             setsContainer.addEventListener('input', updateLogButtonState); 
             
-            // Re-attach listeners after content replacement
             const addSetButton = document.querySelector('button[onclick="addSetRow()"]');
             if (addSetButton) {
                  addSetButton.addEventListener('click', updateLogButtonState);
@@ -452,6 +449,12 @@
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            if (!auth) {
+                authError.textContent = "Cannot connect to Firebase Auth. Check console for initialization errors.";
+                authError.classList.remove('hidden');
+                return;
+            }
+
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const submitButton = document.getElementById('auth-submit-button');
@@ -503,33 +506,49 @@
 
         // --- Final Initialization and State Listener ---
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is signed in (Email/Password)
-                showAppContent(user.uid);
-                
-                if (setsContainer.querySelectorAll('.set-row').length === 0) {
-                    addSetRow();
-                }
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in (Email/Password)
+                    showAppContent(user.uid);
+                    
+                    if (setsContainer.querySelectorAll('.set-row').length === 0) {
+                        addSetRow();
+                    }
 
-                if (!isAuthReady) {
-                    // Only run once on first successful login
-                    attachValidationListeners(); 
-                    updateLogButtonState();
-                    startHistoryListener();
-                    isAuthReady = true;
+                    if (!isAuthReady) {
+                        // Only run once on first successful login
+                        attachValidationListeners(); 
+                        updateLogButtonState();
+                        startHistoryListener();
+                        isAuthReady = true;
+                    }
+                } else {
+                    // User is signed out
+                    showAuthModal();
+                    isAuthReady = false; // Reset auth ready state for next login
                 }
-            } else {
-                // User is signed out
-                showAuthModal();
-                isAuthReady = false; // Reset auth ready state for next login
-            }
-        });
+            });
+        } else {
+            // Fallback for when Firebase is not initialized (e.g., missing __firebase_config on GitHub/locally)
+            console.error("Firebase configuration not found. Cannot start Authentication Listener.");
+            showAuthModal();
+            authTitle.textContent = 'App Configuration Error';
+            authError.textContent = "This app requires a secure Firebase configuration to run fully. If viewing on GitHub/locally, it will not function. Please use the hosting platform provided for this application.";
+            authError.classList.remove('hidden');
+            authForm.classList.add('hidden');
+            toggleAuthModeButton.classList.add('hidden');
+        }
+
 
         // Initialize Lucide icons on window load for initial elements
         window.addEventListener('load', () => {
              if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
+            }
+            // Add a default set row when the app loads (if Firebase is ready)
+            if (auth && setsContainer.querySelectorAll('.set-row').length === 0) {
+                addSetRow();
             }
         });
 
